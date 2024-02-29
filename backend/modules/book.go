@@ -21,15 +21,15 @@ type Outlay struct {
 
 // 支出类型
 type OutlayCat struct {
-	Id       uuid.UUID   `gorm:"not null;primaryKey;"` // Id
-	ParentId *uuid.UUID  // 父级Id
-	Name     string      `gorm:"not null;size:64;"`  // 名称
-	Unit     string      `gorm:"not null;size:16;"`  // 单位
-	Priority int8        `gorm:"not null;"`          // 优先级
-	Stable   bool        `gorm:"not null;"`          // 是否固定
-	Remark   *string     `gorm:"not null;size:256;"` // 备注
-	Parent   *OutlayCat  // 父级
-	Children []OutlayCat `gorm:"foreignKey:ParentId;"` // 子级列表
+	Id       uuid.UUID   `gorm:"not null;primaryKey;"`              // Id
+	ParentId *uuid.UUID  ``                                         // 父级Id
+	Name     string      `gorm:"not null;size:64;"`                 // 名称
+	Unit     string      `gorm:"not null;size:16;"`                 // 单位
+	Priority uint8       `gorm:"not null;"`                         // 优先级
+	Stable   bool        `gorm:"not null;"`                         // 是否固定
+	Remark   *string     `gorm:"not null;size:256;"`                // 备注
+	Parent   *OutlayCat  `gorm:"foreignKey:Id;references:ParentId"` // 父级
+	Children []OutlayCat `gorm:"foreignKey:ParentId;references:Id"` // 子级列表
 }
 
 // 收入
@@ -45,7 +45,7 @@ type Income struct {
 // 收入类型
 type IncomeCat struct {
 	Id       uuid.UUID   `gorm:"not null;primaryKey;"` // Id
-	ParentId *uuid.UUID  // 父级Id
+	ParentId *uuid.UUID  ``                            // 父级Id
 	Name     string      `gorm:"not null;size:64;"`    // 名称
 	Stable   bool        `gorm:"not null;"`            // 是否固定
 	Remark   string      `gorm:"not null;size:256;"`   // 备注
