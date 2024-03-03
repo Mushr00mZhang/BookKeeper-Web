@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"bookkeeper/controllers/outlay"
-	"bookkeeper/controllers/outlaycat"
+	"bookkeeper-backend/controllers/outlay"
+	"bookkeeper-backend/controllers/outlaycat"
 
 	"github.com/gorilla/mux"
 )

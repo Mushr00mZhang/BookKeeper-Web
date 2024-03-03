@@ -4,7 +4,8 @@ import (
 	"errors"
 	"log"
 
-	"bookkeeper/modules/book"
+	"bookkeeper-backend/models/outlay"
+	"bookkeeper-backend/models/outlaycat"
 
 	"gorm.io/gorm"
 )
@@ -19,7 +20,7 @@ func Init(db *gorm.DB) error {
 		return errors.New("db is nil")
 	}
 	log.Println("数据库迁移中。")
-	err := db.AutoMigrate(&book.Outlay{}, &book.OutlayCat{})
+	err := db.AutoMigrate(&outlay.Outlay{}, &outlaycat.OutlayCat{})
 	if err != nil {
 		log.Println("数据库迁移失败。")
 		return err

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"bookkeeper/controllers"
-	"bookkeeper/modules/database"
+	"bookkeeper-backend/controllers"
+	"bookkeeper-backend/models/database"
 	"log"
 	"net/http"
 

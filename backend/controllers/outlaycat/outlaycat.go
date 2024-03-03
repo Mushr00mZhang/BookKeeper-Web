@@ -1,9 +1,12 @@
 package outlaycat
 
 import (
-	"bookkeeper/modules/book"
-	"bookkeeper/modules/database"
+	outlaycat_dto "bookkeeper-backend/dtos/outlaycat"
+	"bookkeeper-backend/models/database"
+	"bookkeeper-backend/services/outlaycat"
 	"encoding/json"
+	"io"
+	"log"
 	"net/http"
 
 	"github.com/google/uuid"
@@ -20,26 +23,50 @@ func Init(r *mux.Router) {
 	base.HandleFunc("/{id}", Delete).Methods("DELETE")
 }
 func List(w http.ResponseWriter, r *http.Request) {
-	res := book.ListOutlayCat(database.DB)
+	vars := mux.Vars(r)
+	dto := outlaycat_dto.ParseListDto(vars)
+	res := outlaycat.List(database.DB, dto)
 	bytes, _ := json.Marshal(res)
 	w.Header().Add("Content-Type", "application/json")
 	w.Write(bytes)
 	w.WriteHeader(200)
 }
 func PagedList(w http.ResponseWriter, r *http.Request) {
-
+	vars := mux.Vars(r)
+	dto := outlaycat_dto.ParsePagedListDto(vars)
+	res := outlaycat.PagedList(database.DB, dto)
+	bytes, _ := json.Marshal(res)
+	w.Header().Add("Content-Type", "application/json")
+	w.Write(bytes)
+	w.WriteHeader(200)
 }
 func Get(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	res := book.GetOutlayCat(database.DB, uuid.MustParse(vars["id"]))
+	id, err := uuid.Parse(vars["Id"])
+	if err != nil {
+		log.Printf("解析Id失败。\n")
+	}
+	res := outlaycat.Get(database.DB, id)
 	bytes, _ := json.Marshal(res)
 	w.Header().Add("Content-Type", "application/json")
 	w.Write(bytes)
 	w.WriteHeader(200)
 }
 func Create(w http.ResponseWriter, r *http.Request) {
-	res := book.CreateOutlayCat(database.DB)
-	bytes, _ := json.Marshal(res)
+	var dto outlaycat_dto.CreateDto
+	bytes, err := io.ReadAll(r.Body)
+	if err != nil {
+		log.Printf("读取Body失败。%s\n", err)
+	}
+	err = json.Unmarshal(bytes, &dto)
+	if err != nil {
+		log.Printf("反序列化JSON失败。%s\n", err)
+	}
+	res := outlaycat.Create(database.DB, dto)
+	bytes, err = json.Marshal(res)
+	if err != nil {
+		log.Printf("序列化JSON失败。%s\n", err)
+	}
 	w.Header().Add("Content-Type", "application/json")
 	w.Write(bytes)
 	w.WriteHeader(200)
