@@ -13,9 +13,10 @@ import (
 const TABLE = "outlays"
 const NAME = "支出"
 
-func List(db *gorm.DB, dto outlay.ListDto) []outlay.Dto {
-	var res []outlay.Dto
-	tx := db.Model(&outlay_model.Outlay{}).Where("Parent = ?", dto.ParentId)
+func FilterList(tx *gorm.DB, dto outlay.ListDto) *gorm.DB {
+	// if dto.ParentId != nil && *dto.ParentId != uuid.Nil {
+	// 	tx = tx.Where("Parent = ?", dto.ParentId)
+	// }
 	if dto.CatId != nil {
 		tx = tx.Where("CatId = ?", dto.CatId)
 	}
@@ -31,34 +32,52 @@ func List(db *gorm.DB, dto outlay.ListDto) []outlay.Dto {
 	if dto.ETime != nil {
 		tx.Where("Date <= ?", dto.ETime)
 	}
-	tx = tx.Find(&res)
+	if dto.UserId != nil {
+		tx = tx.Where("UserId = ?", dto.UserId)
+	}
+	return tx
+}
+func List(db *gorm.DB, dto outlay.ListDto) []outlay.Dto {
+	var res []outlay.Dto
+	tx := db.Model(&outlay_model.Outlay{})
+	tx = FilterList(tx, dto).Find(&res)
 	if tx.Error != nil {
 		log.Printf("获取%s列表失败。%s\n", NAME, tx.Error)
 		return make([]outlay.Dto, 0)
 	}
 	return res
 }
+func Count(db *gorm.DB, dto outlay.ListDto) int {
+	var res int64 = 0
+	tx := db.Model(&outlay_model.Outlay{})
+	tx = FilterList(tx, dto).Count(&res)
+	if tx.Error != nil {
+		log.Printf("获取%s列表数量失败。%s\n", NAME, tx.Error)
+	}
+	return int(res)
+}
 func PagedList(db *gorm.DB, dto outlay.PagedListDto) pagedlist.ResDto[outlay.Dto] {
-	list := List(db, dto.ListDto)
-	total := len(list)
-	pagedList := make([]outlay.Dto, 0)
-	sIndex := dto.Dto.Index * dto.Dto.Size
-	eIndex := sIndex + dto.Dto.Size
-	if sIndex < total && eIndex <= total {
-		pagedList = list[sIndex:eIndex]
-	} else if eIndex > total {
-		pagedList = list[sIndex:total]
+	total := Count(db, dto.ListDto)
+	items := make([]outlay.Dto, 0)
+	if total == 0 {
+		return pagedlist.ResDto[outlay.Dto]{
+			Total: total,
+			Items: items,
+		}
+	}
+	tx := db.Model(&outlay_model.Outlay{})
+	tx = FilterList(tx, dto.ListDto).Offset(dto.Index * dto.Size).Limit(dto.Size).Find(&items)
+	if tx.Error != nil {
+		log.Printf("获取%s分页列表失败。%s\n", NAME, tx.Error)
 	}
 	return pagedlist.ResDto[outlay.Dto]{
 		Total: total,
-		Items: pagedList,
+		Items: items,
 	}
 }
 func Get(db *gorm.DB, id uuid.UUID) *outlay.Dto {
 	var res outlay.Dto
-	tx := db.Model(&outlay_model.Outlay{
-		Id: id,
-	}).First(&res)
+	tx := db.Model(&outlay_model.Outlay{Id: id}).First(&res)
 	if tx.Error != nil {
 		log.Printf("获取%s失败。%s\n", NAME, tx.Error)
 		return nil
@@ -76,4 +95,24 @@ func Create(db *gorm.DB, dto outlay.CreateDto) *uuid.UUID {
 		return nil
 	}
 	return &model.Id
+}
+func Update(db *gorm.DB, dto outlay.UpdateDto) bool {
+	model := outlay_model.Outlay{
+		Base: dto.Base,
+		Id:   dto.Id,
+	}
+	tx := db.Omit("Id").Updates(&model)
+	if tx.Error != nil {
+		log.Printf("更新%s失败。%s\n", NAME, tx.Error)
+		return false
+	}
+	return true
+}
+func Delete(db *gorm.DB, id uuid.UUID) bool {
+	tx := db.Delete(&outlay_model.Outlay{Id: id})
+	if tx.Error != nil {
+		log.Printf("删除%s失败。%s\n", NAME, tx.Error)
+		return false
+	}
+	return true
 }

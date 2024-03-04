@@ -70,11 +70,35 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	w.Write(bytes)
 	w.WriteHeader(200)
-
 }
 func Update(w http.ResponseWriter, r *http.Request) {
-
+	var dto outlaycat_dto.UpdateDto
+	bytes, err := io.ReadAll(r.Body)
+	if err != nil {
+		log.Printf("读取Body失败。%s\n", err)
+	}
+	err = json.Unmarshal(bytes, &dto)
+	if err != nil {
+		log.Printf("反序列化JSON失败。%s\n", err)
+	}
+	res := outlaycat.Update(database.DB, dto)
+	bytes, err = json.Marshal(res)
+	if err != nil {
+		log.Printf("序列化JSON失败。%s\n", err)
+	}
+	w.Header().Add("Content-Type", "application/json")
+	w.Write(bytes)
+	w.WriteHeader(200)
 }
 func Delete(w http.ResponseWriter, r *http.Request) {
-
+	vars := mux.Vars(r)
+	id, err := uuid.Parse(vars["Id"])
+	if err != nil {
+		log.Printf("解析Id失败。\n")
+	}
+	res := outlaycat.Delete(database.DB, id)
+	bytes, _ := json.Marshal(res)
+	w.Header().Add("Content-Type", "application/json")
+	w.Write(bytes)
+	w.WriteHeader(200)
 }

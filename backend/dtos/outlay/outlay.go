@@ -25,21 +25,22 @@ type UpdateDto struct {
 
 // 获取支出列表Dto
 type ListDto struct {
-	ParentId *uuid.UUID // 父级Id
+	// ParentId *uuid.UUID // 父级Id
 	CatId    *uuid.UUID // 类型Id
 	LowMoney *float32   // 最低金额
 	TopMoney *float32   // 最高金额
 	STime    *time.Time // 开始时间
 	ETime    *time.Time // 结束时间
+	UserId   *uuid.UUID // 用户Id
 }
 
 // 解析获取支出列表Dto
 func ParseListDto(vars map[string]string) ListDto {
 	dto := ListDto{}
-	parentId, err := uuid.Parse(vars["ParentId"])
-	if err == nil {
-		dto.ParentId = &parentId
-	}
+	// parentId, err := uuid.Parse(vars["ParentId"])
+	// if err == nil {
+	// 	dto.ParentId = &parentId
+	// }
 	catId, err := uuid.Parse(vars["CatId"])
 	if err == nil {
 		dto.CatId = &catId
@@ -61,6 +62,10 @@ func ParseListDto(vars map[string]string) ListDto {
 	eTime, err := utils.ParseTime(vars["ETime"])
 	if err == nil {
 		dto.ETime = eTime
+	}
+	userId, err := uuid.Parse(vars["UserId"])
+	if err == nil {
+		dto.UserId = &userId
 	}
 	return dto
 }
