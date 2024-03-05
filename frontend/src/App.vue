@@ -1,9 +1,15 @@
 <template>
   <div class="common-layout">
     <Framework>
-      <Header #header></Header>
-      <Aside #aside></Aside>
-      <Main #main></Main>
+      <template #header>
+        <Header></Header>
+      </template>
+      <template #aside>
+        <Aside></Aside>
+      </template>
+      <template #main>
+        <Main></Main>
+      </template>
     </Framework>
   </div>
 </template>

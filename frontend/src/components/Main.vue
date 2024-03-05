@@ -1,5 +1,11 @@
 <template>
-  <RouterView></RouterView>
+  <RouterView #="{ Component }">
+    <Transition>
+      <KeepAlive>
+        <Component :is="Component" />
+      </KeepAlive>
+    </Transition>
+  </RouterView>
 </template>
 <script setup lang="ts">
 import { RouterView, useRouter } from 'vue-router';

@@ -1,4 +1,5 @@
 <template>
+  列表页
   <div v-for="item in items">
     {{ item.name }}
   </div>

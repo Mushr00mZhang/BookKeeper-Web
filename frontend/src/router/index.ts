@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import OutlayCatList from '@/views/OutlayCat/List.vue';
-
+import Index from '@/views/Index/Index.vue';
 const routes: RouteRecordRaw[] = [
-  // { path: '/', component: Home },
-  { path: '/outlaycat', children: [{ path: '/list', component: OutlayCatList }] },
+  { path: '/', component: Index },
+  { path: '/outlaycat', children: [{ path: '/outlaycat/list', component: OutlayCatList }] },
 ];
 
 export const router = createRouter({
