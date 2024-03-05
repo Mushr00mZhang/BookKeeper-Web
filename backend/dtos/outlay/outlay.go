@@ -72,14 +72,14 @@ func ParseListDto(vars map[string]string) ListDto {
 
 // 获取支出分页列表Dto
 type PagedListDto struct {
-	pagedlist.Dto
+	pagedlist.GetDto
 	ListDto
 }
 
 // 解析获取支出分页列表Dto
 func ParsePagedListDto(vars map[string]string) PagedListDto {
 	return PagedListDto{
-		Dto:     pagedlist.ParseDto(vars),
+		GetDto:  pagedlist.ParseGetDto(vars),
 		ListDto: ParseListDto(vars),
 	}
 }

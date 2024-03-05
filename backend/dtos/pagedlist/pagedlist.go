@@ -2,22 +2,24 @@ package pagedlist
 
 import "strconv"
 
-// 分页Dto
-type Dto struct {
+// 获取分页列表Dto
+type GetDto struct {
 	// 序号
 	Index int
 	// 大小
 	Size int
 }
 
-// 分页结果Dto
-type ResDto[T any] struct {
+// 分页列表Dto
+type Dto[T any] struct {
+	// 总数
 	Total int
+	// 列表
 	Items []T
 }
 
-func ParseDto(vars map[string]string) Dto {
-	dto := Dto{}
+func ParseGetDto(vars map[string]string) GetDto {
+	dto := GetDto{}
 	size, err := strconv.ParseInt(vars["Size"], 10, 32)
 	if err == nil {
 		dto.Size = int(size)

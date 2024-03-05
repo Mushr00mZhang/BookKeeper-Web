@@ -56,11 +56,11 @@ func Count(db *gorm.DB, dto outlay.ListDto) int {
 	}
 	return int(res)
 }
-func PagedList(db *gorm.DB, dto outlay.PagedListDto) pagedlist.ResDto[outlay.Dto] {
+func PagedList(db *gorm.DB, dto outlay.PagedListDto) pagedlist.Dto[outlay.Dto] {
 	total := Count(db, dto.ListDto)
 	items := make([]outlay.Dto, 0)
 	if total == 0 {
-		return pagedlist.ResDto[outlay.Dto]{
+		return pagedlist.Dto[outlay.Dto]{
 			Total: total,
 			Items: items,
 		}
@@ -70,7 +70,7 @@ func PagedList(db *gorm.DB, dto outlay.PagedListDto) pagedlist.ResDto[outlay.Dto
 	if tx.Error != nil {
 		log.Printf("获取%s分页列表失败。%s\n", NAME, tx.Error)
 	}
-	return pagedlist.ResDto[outlay.Dto]{
+	return pagedlist.Dto[outlay.Dto]{
 		Total: total,
 		Items: items,
 	}
