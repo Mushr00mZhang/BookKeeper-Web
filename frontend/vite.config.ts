@@ -6,11 +6,8 @@ import ElementPlus from 'unplugin-element-plus/vite';
 export default defineConfig({
   plugins: [ElementPlus({}), vue()],
   resolve: {
-    alias: [
-      {
-        find: '@',
-        replacement: './src',
-      },
-    ],
+    alias: {
+      '@': '/src/',
+    },
   },
 });
