@@ -4,6 +4,7 @@ import (
 	"bookkeeper-backend/dtos/pagedlist"
 	"bookkeeper-backend/models/outlay"
 	"bookkeeper-backend/models/outlaycat"
+	"net/url"
 
 	"github.com/google/uuid"
 )
@@ -29,9 +30,9 @@ type ListDto struct {
 	ParentId *uuid.UUID // 父级Id
 }
 
-func ParseListDto(vars map[string]string) ListDto {
+func ParseListDto(values url.Values) ListDto {
 	dto := ListDto{}
-	parentId, err := uuid.Parse(vars["ParentId"])
+	parentId, err := uuid.Parse(values.Get("ParentId"))
 	if err == nil {
 		dto.ParentId = &parentId
 	}
@@ -44,9 +45,9 @@ type PagedListDto struct {
 	ListDto
 }
 
-func ParsePagedListDto(vars map[string]string) PagedListDto {
+func ParsePagedListDto(values url.Values) PagedListDto {
 	return PagedListDto{
-		GetDto:  pagedlist.ParseGetDto(vars),
-		ListDto: ParseListDto(vars),
+		GetDto:  pagedlist.ParseGetDto(values),
+		ListDto: ParseListDto(values),
 	}
 }

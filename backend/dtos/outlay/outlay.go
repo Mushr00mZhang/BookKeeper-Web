@@ -1,6 +1,7 @@
 package outlay
 
 import (
+	"net/url"
 	"strconv"
 	"time"
 
@@ -25,7 +26,6 @@ type UpdateDto struct {
 
 // 获取支出列表Dto
 type ListDto struct {
-	// ParentId *uuid.UUID // 父级Id
 	CatId    *uuid.UUID // 类型Id
 	LowMoney *float32   // 最低金额
 	TopMoney *float32   // 最高金额
@@ -35,35 +35,31 @@ type ListDto struct {
 }
 
 // 解析获取支出列表Dto
-func ParseListDto(vars map[string]string) ListDto {
+func ParseListDto(values url.Values) ListDto {
 	dto := ListDto{}
-	// parentId, err := uuid.Parse(vars["ParentId"])
-	// if err == nil {
-	// 	dto.ParentId = &parentId
-	// }
-	catId, err := uuid.Parse(vars["CatId"])
+	catId, err := uuid.Parse(values.Get("CatId"))
 	if err == nil {
 		dto.CatId = &catId
 	}
-	lowMoney, err := strconv.ParseFloat(vars["LowMoney"], 32)
+	lowMoney, err := strconv.ParseFloat(values.Get("LowMoney"), 32)
 	if err == nil {
 		temp := float32(lowMoney)
 		dto.LowMoney = &temp
 	}
-	topMoney, err := strconv.ParseFloat(vars["TopMoney"], 32)
+	topMoney, err := strconv.ParseFloat(values.Get("TopMoney"), 32)
 	if err == nil {
 		temp := float32(topMoney)
 		dto.TopMoney = &temp
 	}
-	sTime, err := utils.ParseTime(vars["STime"])
+	sTime, err := utils.ParseTime(values.Get("STime"))
 	if err == nil {
 		dto.STime = sTime
 	}
-	eTime, err := utils.ParseTime(vars["ETime"])
+	eTime, err := utils.ParseTime(values.Get("ETime"))
 	if err == nil {
 		dto.ETime = eTime
 	}
-	userId, err := uuid.Parse(vars["UserId"])
+	userId, err := uuid.Parse(values.Get("UserId"))
 	if err == nil {
 		dto.UserId = &userId
 	}
@@ -77,9 +73,9 @@ type PagedListDto struct {
 }
 
 // 解析获取支出分页列表Dto
-func ParsePagedListDto(vars map[string]string) PagedListDto {
+func ParsePagedListDto(values url.Values) PagedListDto {
 	return PagedListDto{
-		GetDto:  pagedlist.ParseGetDto(vars),
-		ListDto: ParseListDto(vars),
+		GetDto:  pagedlist.ParseGetDto(values),
+		ListDto: ParseListDto(values),
 	}
 }

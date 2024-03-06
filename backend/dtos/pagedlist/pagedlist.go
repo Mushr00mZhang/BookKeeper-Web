@@ -1,6 +1,9 @@
 package pagedlist
 
-import "strconv"
+import (
+	"net/url"
+	"strconv"
+)
 
 // 获取分页列表Dto
 type GetDto struct {
@@ -18,13 +21,13 @@ type Dto[T any] struct {
 	Items []T
 }
 
-func ParseGetDto(vars map[string]string) GetDto {
+func ParseGetDto(values url.Values) GetDto {
 	dto := GetDto{}
-	size, err := strconv.ParseInt(vars["Size"], 10, 32)
+	size, err := strconv.ParseInt(values.Get("Size"), 10, 32)
 	if err == nil {
 		dto.Size = int(size)
 	}
-	index, err := strconv.ParseInt(vars["Index"], 10, 32)
+	index, err := strconv.ParseInt(values.Get("Index"), 10, 32)
 	if err == nil {
 		dto.Index = int(index)
 	}

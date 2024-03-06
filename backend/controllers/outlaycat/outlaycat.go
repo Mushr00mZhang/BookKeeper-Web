@@ -17,14 +17,14 @@ func Init(r *mux.Router) {
 	base := r.PathPrefix("/outlaycats").Subrouter()
 	base.HandleFunc("", List).Methods("GET")
 	base.HandleFunc("/paged-list", PagedList).Methods("GET")
-	base.HandleFunc("/{id}", Get).Methods("GET")
+	base.HandleFunc("/{Id}", Get).Methods("GET")
 	base.HandleFunc("", Create).Methods("POST")
-	base.HandleFunc("/{id}", Update).Methods("PUT")
-	base.HandleFunc("/{id}", Delete).Methods("DELETE")
+	base.HandleFunc("/{Id}", Update).Methods("PUT")
+	base.HandleFunc("/{Id}", Delete).Methods("DELETE")
 }
 func List(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	dto := outlaycat_dto.ParseListDto(vars)
+	values := r.URL.Query()
+	dto := outlaycat_dto.ParseListDto(values)
 	res := outlaycat.List(database.DB, dto)
 	bytes, _ := json.Marshal(res)
 	w.Header().Add("Content-Type", "application/json")
@@ -32,8 +32,8 @@ func List(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 }
 func PagedList(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	dto := outlaycat_dto.ParsePagedListDto(vars)
+	values := r.URL.Query()
+	dto := outlaycat_dto.ParsePagedListDto(values)
 	res := outlaycat.PagedList(database.DB, dto)
 	bytes, _ := json.Marshal(res)
 	w.Header().Add("Content-Type", "application/json")
