@@ -23,13 +23,19 @@ type Dto[T any] struct {
 
 func ParseGetDto(values url.Values) GetDto {
 	dto := GetDto{}
-	size, err := strconv.ParseInt(values.Get("Size"), 10, 32)
+	size, err := strconv.ParseInt(values.Get("size"), 10, 32)
 	if err == nil {
 		dto.Size = int(size)
 	}
-	index, err := strconv.ParseInt(values.Get("Index"), 10, 32)
+	index, err := strconv.ParseInt(values.Get("index"), 10, 32)
 	if err == nil {
 		dto.Index = int(index)
 	}
 	return dto
+}
+func Empty[T any]() Dto[T] {
+	return Dto[T]{
+		Total: 0,
+		Items: make([]T, 0),
+	}
 }
