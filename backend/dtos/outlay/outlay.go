@@ -37,29 +37,29 @@ type ListDto struct {
 // 解析获取支出列表Dto
 func ParseListDto(values url.Values) ListDto {
 	dto := ListDto{}
-	catId, err := uuid.Parse(values.Get("CatId"))
+	catId, err := uuid.Parse(values.Get("catId"))
 	if err == nil {
 		dto.CatId = &catId
 	}
-	lowMoney, err := strconv.ParseFloat(values.Get("LowMoney"), 32)
+	lowMoney, err := strconv.ParseFloat(values.Get("lowMoney"), 32)
 	if err == nil {
 		temp := float32(lowMoney)
 		dto.LowMoney = &temp
 	}
-	topMoney, err := strconv.ParseFloat(values.Get("TopMoney"), 32)
+	topMoney, err := strconv.ParseFloat(values.Get("topMoney"), 32)
 	if err == nil {
 		temp := float32(topMoney)
 		dto.TopMoney = &temp
 	}
-	sTime, err := utils.ParseTime(values.Get("STime"))
+	sTime, err := utils.ParseTime(values.Get("sTime"))
 	if err == nil {
 		dto.STime = sTime
 	}
-	eTime, err := utils.ParseTime(values.Get("ETime"))
+	eTime, err := utils.ParseTime(values.Get("eTime"))
 	if err == nil {
 		dto.ETime = eTime
 	}
-	userId, err := uuid.Parse(values.Get("UserId"))
+	userId, err := uuid.Parse(values.Get("userId"))
 	if err == nil {
 		dto.UserId = &userId
 	}

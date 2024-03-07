@@ -17,10 +17,10 @@ func Init(r *mux.Router) {
 	base := r.PathPrefix("/outlaycats").Subrouter()
 	base.HandleFunc("", List).Methods("GET")
 	base.HandleFunc("/paged-list", PagedList).Methods("GET")
-	base.HandleFunc("/{Id}", Get).Methods("GET")
+	base.HandleFunc("/{id}", Get).Methods("GET")
 	base.HandleFunc("", Create).Methods("POST")
-	base.HandleFunc("/{Id}", Update).Methods("PUT")
-	base.HandleFunc("/{Id}", Delete).Methods("DELETE")
+	base.HandleFunc("/{id}", Update).Methods("PUT")
+	base.HandleFunc("/{id}", Delete).Methods("DELETE")
 }
 func List(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
@@ -42,7 +42,7 @@ func PagedList(w http.ResponseWriter, r *http.Request) {
 }
 func Get(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	id, err := uuid.Parse(vars["Id"])
+	id, err := uuid.Parse(vars["id"])
 	if err != nil {
 		log.Printf("解析Id失败。\n")
 	}
