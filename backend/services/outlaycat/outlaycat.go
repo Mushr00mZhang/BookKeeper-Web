@@ -4,6 +4,7 @@ import (
 	"bookkeeper-backend/dtos/outlaycat"
 	"bookkeeper-backend/dtos/pagedlist"
 	outlaycat_model "bookkeeper-backend/models/outlaycat"
+	"errors"
 	"log"
 
 	"github.com/google/uuid"
@@ -75,7 +76,7 @@ func Create(db *gorm.DB, dto outlaycat.CreateDto) (*uuid.UUID, int8, error) {
 	}).First(&dumplicate)
 	if dumplicate != nil && dumplicate.Id != uuid.Nil && dumplicate.Name == dto.Name {
 		log.Printf("创建%s失败。存在重复名称。\n", NAME)
-		return nil, 1, nil
+		return nil, 1, errors.New("存在重复名称")
 	} else if tx.Error != nil {
 		log.Printf("创建%s失败。查重失败。%s\n", NAME, tx.Error)
 		return nil, 2, tx.Error
@@ -100,7 +101,7 @@ func Update(db *gorm.DB, dto outlaycat.UpdateDto) (bool, int8, error) {
 	}).Not("Id = ?", dto.Id).First(&dumplicate)
 	if dumplicate != nil && dumplicate.Id != uuid.Nil && dumplicate.Name == dto.Name {
 		log.Printf("更新%s失败。存在重复名称。\n", NAME)
-		return false, 1, nil
+		return false, 1, errors.New("存在重复名称")
 	} else if tx.Error != nil {
 		log.Printf("更新%s失败。查重失败。%s\n", NAME, tx.Error)
 		return false, 2, tx.Error

@@ -2,6 +2,8 @@ package outlaycat
 
 import (
 	outlaycat_dto "bookkeeper-backend/dtos/outlaycat"
+	"bookkeeper-backend/dtos/pagedlist"
+	"bookkeeper-backend/dtos/result"
 	"bookkeeper-backend/models/database"
 	"bookkeeper-backend/services/outlaycat"
 	"encoding/json"
@@ -25,80 +27,191 @@ func Init(r *mux.Router) {
 func List(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
 	dto := outlaycat_dto.ParseListDto(values)
-	res := outlaycat.List(database.DB, dto)
-	bytes, _ := json.Marshal(res)
-	w.Header().Add("Content-Type", "application/json")
-	w.Write(bytes)
-	w.WriteHeader(200)
+	list, code, err := outlaycat.List(database.DB, dto)
+	res := result.Dto[[]outlaycat_dto.Dto]{
+		Code:   code,
+		Result: list,
+		Tip:    "查询成功",
+		Error:  err,
+	}
+	if err == nil {
+		res.Tip = "查询失败"
+		res.Return(w, 500)
+		return
+	}
+	res.Return(w, 200)
 }
 func PagedList(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
 	dto := outlaycat_dto.ParsePagedListDto(values)
-	res := outlaycat.PagedList(database.DB, dto)
-	bytes, _ := json.Marshal(res)
-	w.Header().Add("Content-Type", "application/json")
-	w.Write(bytes)
-	w.WriteHeader(200)
+	list, code, err := outlaycat.PagedList(database.DB, dto)
+	res := result.Dto[pagedlist.Dto[outlaycat_dto.Dto]]{
+		Code:   code,
+		Result: list,
+		Tip:    "查询成功",
+		Error:  err,
+	}
+	if err == nil {
+		res.Tip = "查询失败"
+		res.Return(w, 500)
+		return
+	}
+	res.Return(w, 200)
 }
 func Get(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := uuid.Parse(vars["id"])
 	if err != nil {
 		log.Printf("解析Id失败。\n")
+		res := result.Dto[*outlaycat_dto.Dto]{
+			Code:  1,
+			Tip:   "解析Id失败",
+			Error: err,
+		}
+		res.Return(w, 400)
+		return
 	}
-	res := outlaycat.Get(database.DB, id)
-	bytes, _ := json.Marshal(res)
-	w.Header().Add("Content-Type", "application/json")
-	w.Write(bytes)
-	w.WriteHeader(200)
+	item, code, err := outlaycat.Get(database.DB, id)
+	res := result.Dto[*outlaycat_dto.Dto]{
+		Code:   0,
+		Result: item,
+		Tip:    "查询成功",
+		Error:  err,
+	}
+	if err != nil {
+		res.Code = code + 1
+		res.Tip = "查询失败"
+		res.Return(w, 500)
+		return
+	}
+	res.Return(w, 200)
 }
 func Create(w http.ResponseWriter, r *http.Request) {
 	var dto outlaycat_dto.CreateDto
 	bytes, err := io.ReadAll(r.Body)
 	if err != nil {
 		log.Printf("读取Body失败。%s\n", err)
+		res := result.Dto[*uuid.UUID]{
+			Code:  1,
+			Tip:   "读取Body失败",
+			Error: err,
+		}
+		res.Return(w, 500)
+		return
 	}
 	err = json.Unmarshal(bytes, &dto)
 	if err != nil {
 		log.Printf("反序列化JSON失败。%s\n", err)
+		res := result.Dto[*uuid.UUID]{
+			Code:  2,
+			Tip:   "反序列化JSON失败",
+			Error: err,
+		}
+		res.Return(w, 400)
+		return
 	}
-	res := outlaycat.Create(database.DB, dto)
-	bytes, err = json.Marshal(res)
+	id, code, err := outlaycat.Create(database.DB, dto)
+	res := result.Dto[*uuid.UUID]{
+		Code:   0,
+		Result: id,
+		Tip:    "查询成功",
+		Error:  err,
+	}
 	if err != nil {
-		log.Printf("序列化JSON失败。%s\n", err)
+		res.Code = code + 2
+		res.Tip = "查询失败"
+		res.Return(w, 500)
+		return
 	}
-	w.Header().Add("Content-Type", "application/json")
-	w.Write(bytes)
-	w.WriteHeader(200)
+	res.Return(w, 200)
 }
 func Update(w http.ResponseWriter, r *http.Request) {
 	var dto outlaycat_dto.UpdateDto
+	vars := mux.Vars(r)
+	id, err := uuid.Parse(vars["id"])
+	if err != nil {
+		log.Printf("解析Id失败。\n")
+		res := result.Dto[bool]{
+			Code:  1,
+			Tip:   "解析Id失败",
+			Error: err,
+		}
+		res.Return(w, 400)
+		return
+	}
 	bytes, err := io.ReadAll(r.Body)
 	if err != nil {
 		log.Printf("读取Body失败。%s\n", err)
+		res := result.Dto[bool]{
+			Code:  2,
+			Tip:   "读取Body失败",
+			Error: err,
+		}
+		res.Return(w, 500)
+		return
 	}
 	err = json.Unmarshal(bytes, &dto)
 	if err != nil {
 		log.Printf("反序列化JSON失败。%s\n", err)
+		res := result.Dto[bool]{
+			Code:  3,
+			Tip:   "反序列化JSON失败",
+			Error: err,
+		}
+		res.Return(w, 400)
+		return
 	}
-	res := outlaycat.Update(database.DB, dto)
-	bytes, err = json.Marshal(res)
+	if id != dto.Id {
+		log.Printf("Query与Body中的Id不一致。\n")
+		res := result.Dto[bool]{
+			Code:  4,
+			Tip:   "Query与Body中的Id不一致",
+			Error: err,
+		}
+		res.Return(w, 400)
+		return
+	}
+	s, code, err := outlaycat.Update(database.DB, dto)
+	res := result.Dto[bool]{
+		Code:   0,
+		Result: s,
+		Tip:    "更新成功",
+		Error:  err,
+	}
 	if err != nil {
-		log.Printf("序列化JSON失败。%s\n", err)
+		res.Code = code + 4
+		res.Tip = "更新失败"
+		res.Return(w, 500)
+		return
 	}
-	w.Header().Add("Content-Type", "application/json")
-	w.Write(bytes)
-	w.WriteHeader(200)
+	res.Return(w, 200)
 }
 func Delete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := uuid.Parse(vars["Id"])
 	if err != nil {
 		log.Printf("解析Id失败。\n")
+		res := result.Dto[bool]{
+			Code:   1,
+			Result: false,
+			Tip:    "解析Id失败",
+			Error:  err,
+		}
+		res.Return(w, 400)
+		return
 	}
-	res := outlaycat.Delete(database.DB, id)
-	bytes, _ := json.Marshal(res)
-	w.Header().Add("Content-Type", "application/json")
-	w.Write(bytes)
-	w.WriteHeader(200)
+	s, code, err := outlaycat.Delete(database.DB, id)
+	res := result.Dto[bool]{
+		Code:   0,
+		Result: s,
+		Tip:    "删除成功",
+		Error:  err,
+	}
+	if err != nil {
+		res.Code = code + 1
+		res.Tip = "删除失败"
+		res.Return(w, 500)
+		return
+	}
+	res.Return(w, 200)
 }
