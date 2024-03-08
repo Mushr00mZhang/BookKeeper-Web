@@ -13,11 +13,11 @@ type Dto[T any] struct {
 }
 
 // 返回结果
-func (dto Dto[T]) Return(w http.ResponseWriter, statusCode int) {
+func (dto Dto[T]) Return(w *http.ResponseWriter, statusCode int) {
 	bytes := dto.Marshal()
-	w.Header().Add("Content-Type", "application/json")
-	w.Write(bytes)
-	w.WriteHeader(statusCode)
+	(*w).Header().Set("Content-Type", "application/json")
+	(*w).WriteHeader(statusCode)
+	(*w).Write(bytes)
 }
 
 // 序列化

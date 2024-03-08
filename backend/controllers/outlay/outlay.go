@@ -36,10 +36,10 @@ func List(w http.ResponseWriter, r *http.Request) {
 	}
 	if err == nil {
 		res.Tip = "查询失败"
-		res.Return(w, 500)
+		res.Return(&w, http.StatusInternalServerError)
 		return
 	}
-	res.Return(w, 200)
+	res.Return(&w, http.StatusOK)
 }
 func PagedList(w http.ResponseWriter, r *http.Request) {
 	values := r.URL.Query()
@@ -53,10 +53,10 @@ func PagedList(w http.ResponseWriter, r *http.Request) {
 	}
 	if err == nil {
 		res.Tip = "查询失败"
-		res.Return(w, 500)
+		res.Return(&w, http.StatusInternalServerError)
 		return
 	}
-	res.Return(w, 200)
+	res.Return(&w, http.StatusOK)
 }
 func Get(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -68,7 +68,7 @@ func Get(w http.ResponseWriter, r *http.Request) {
 			Tip:   "解析Id失败",
 			Error: err,
 		}
-		res.Return(w, 400)
+		res.Return(&w, http.StatusBadRequest)
 		return
 	}
 	item, code, err := outlay.Get(database.DB, id)
@@ -81,10 +81,10 @@ func Get(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		res.Code = code + 1
 		res.Tip = "查询失败"
-		res.Return(w, 500)
+		res.Return(&w, http.StatusInternalServerError)
 		return
 	}
-	res.Return(w, 200)
+	res.Return(&w, http.StatusOK)
 }
 func Create(w http.ResponseWriter, r *http.Request) {
 	var dto outlay_dto.CreateDto
@@ -96,7 +96,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
 			Tip:   "读取Body失败",
 			Error: err,
 		}
-		res.Return(w, 500)
+		res.Return(&w, http.StatusInternalServerError)
 		return
 	}
 	err = json.Unmarshal(bytes, &dto)
@@ -107,7 +107,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
 			Tip:   "反序列化JSON失败",
 			Error: err,
 		}
-		res.Return(w, 400)
+		res.Return(&w, http.StatusBadRequest)
 		return
 	}
 	id, code, err := outlay.Create(database.DB, dto)
@@ -120,10 +120,10 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		res.Code = code + 2
 		res.Tip = "查询失败"
-		res.Return(w, 500)
+		res.Return(&w, http.StatusInternalServerError)
 		return
 	}
-	res.Return(w, 200)
+	res.Return(&w, http.StatusOK)
 }
 func Update(w http.ResponseWriter, r *http.Request) {
 	var dto outlay_dto.UpdateDto
@@ -136,7 +136,7 @@ func Update(w http.ResponseWriter, r *http.Request) {
 			Tip:   "解析Id失败",
 			Error: err,
 		}
-		res.Return(w, 400)
+		res.Return(&w, http.StatusBadRequest)
 		return
 	}
 	bytes, err := io.ReadAll(r.Body)
@@ -147,7 +147,7 @@ func Update(w http.ResponseWriter, r *http.Request) {
 			Tip:   "读取Body失败",
 			Error: err,
 		}
-		res.Return(w, 500)
+		res.Return(&w, http.StatusInternalServerError)
 		return
 	}
 	err = json.Unmarshal(bytes, &dto)
@@ -158,7 +158,7 @@ func Update(w http.ResponseWriter, r *http.Request) {
 			Tip:   "反序列化JSON失败",
 			Error: err,
 		}
-		res.Return(w, 400)
+		res.Return(&w, http.StatusBadRequest)
 		return
 	}
 	if id != dto.Id {
@@ -168,7 +168,7 @@ func Update(w http.ResponseWriter, r *http.Request) {
 			Tip:   "Query与Body中的Id不一致",
 			Error: err,
 		}
-		res.Return(w, 400)
+		res.Return(&w, http.StatusBadRequest)
 		return
 	}
 	s, code, err := outlay.Update(database.DB, dto)
@@ -181,10 +181,10 @@ func Update(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		res.Code = code + 4
 		res.Tip = "更新失败"
-		res.Return(w, 500)
+		res.Return(&w, http.StatusInternalServerError)
 		return
 	}
-	res.Return(w, 200)
+	res.Return(&w, http.StatusOK)
 }
 func Delete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -197,7 +197,7 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 			Tip:    "解析Id失败",
 			Error:  err,
 		}
-		res.Return(w, 400)
+		res.Return(&w, http.StatusBadRequest)
 		return
 	}
 	s, code, err := outlay.Delete(database.DB, id)
@@ -210,8 +210,8 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		res.Code = code + 1
 		res.Tip = "删除失败"
-		res.Return(w, 500)
+		res.Return(&w, http.StatusInternalServerError)
 		return
 	}
-	res.Return(w, 200)
+	res.Return(&w, http.StatusOK)
 }
