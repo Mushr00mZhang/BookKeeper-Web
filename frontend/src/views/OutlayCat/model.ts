@@ -1,4 +1,6 @@
 import * as PagedList from '@/utils/PagedList';
+import { IResult, Result } from '@/utils/Result';
+import axios from 'axios';
 /**
  * 支出类型基础
  */
@@ -87,4 +89,40 @@ export class OutlayCat implements IDto {
     this.remark = dto.remark;
     this.children = dto.children.map((i) => new OutlayCat(i));
   }
+  static async list(dto: IListDto) {
+    const url = `/api/outlaycats`;
+    const res = await axios.get<Result<IDto[]>>(url, { params: dto });
+    return (res.data.result || []).map((i) => new OutlayCat(i));
+  }
+  static async pagedlist(dto: IPagedListDto) {
+    const url = `/api/outlaycats`;
+    const res = await axios.get<Result<PagedList.IDto<IDto>>>(url, { params: dto });
+    const items = (res.data.result?.items || []).map((i) => new OutlayCat(i));
+    return {
+      total: res.data.result?.total || 0,
+      items,
+    } as PagedList.IDto<IDto>;
+  }
+  static async get(id: string) {
+    const url = `/api/outlaycats/${id}`;
+    const res = await axios.get<Result<IDto>>(url);
+    return (res.data.result && new OutlayCat(res.data.result)) || null;
+  }
+  static async create(dto: ICreateDto) {
+    const url = `/api/outlaycats`;
+    const res = await axios.put<Result<string>>(url, dto);
+    return res.data.result;
+  }
+  static async update(dto: IUpdateDto) {
+    const url = `/api/outlaycats/${dto.id}`;
+    const res = await axios.post<Result<boolean>>(url, dto);
+    return res.data.result;
+  }
+  static async delete(id: string) {
+    const url = `/api/outlaycats/${id}`;
+    const res = await axios.delete<Result<boolean>>(url);
+    return res.data.result;
+  }
+  readonly update = () => OutlayCat.update(this);
+  readonly delete = () => OutlayCat.delete(this.id);
 }
