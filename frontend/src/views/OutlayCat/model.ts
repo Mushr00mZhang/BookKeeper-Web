@@ -1,5 +1,5 @@
 import * as PagedList from '@/utils/PagedList';
-import { IResult, Result } from '@/utils/Result';
+import { Result } from '@/utils/Result';
 import axios from 'axios';
 /**
  * 支出类型基础
@@ -8,7 +8,7 @@ export interface IBase {
   /**
    * 父级Id
    */
-  parentId: string;
+  parentId: string | null;
   /**
    * 名称
    */
@@ -37,7 +37,7 @@ export interface IDto extends IBase {
   /**
    * 主键id
    */
-  id: string;
+  id: string | null;
   /**
    * 子集列表
    */
@@ -71,8 +71,8 @@ export interface IPagedListDto extends IListDto, PagedList.IGetDto {}
  * 支出类型
  */
 export class OutlayCat implements IDto {
-  id: string = '';
-  parentId: string = '';
+  id: string | null = null;
+  parentId: string | null = null;
   name: string = '';
   unit: string = '';
   sort: number = 0;
@@ -110,12 +110,12 @@ export class OutlayCat implements IDto {
   }
   static async create(dto: ICreateDto) {
     const url = `/api/outlaycats`;
-    const res = await axios.put<Result<string>>(url, dto);
+    const res = await axios.post<Result<string>>(url, dto);
     return res.data.result;
   }
   static async update(dto: IUpdateDto) {
     const url = `/api/outlaycats/${dto.id}`;
-    const res = await axios.post<Result<boolean>>(url, dto);
+    const res = await axios.put<Result<boolean>>(url, dto);
     return res.data.result;
   }
   static async delete(id: string) {
@@ -123,6 +123,16 @@ export class OutlayCat implements IDto {
     const res = await axios.delete<Result<boolean>>(url);
     return res.data.result;
   }
-  readonly update = () => OutlayCat.update(this);
-  readonly delete = () => OutlayCat.delete(this.id);
+  readonly create = async () => {
+    this.id = await OutlayCat.create(this as ICreateDto);
+    return this.id;
+  };
+  readonly update = () => {
+    if (this.id) return OutlayCat.update(this as IUpdateDto);
+    return false;
+  };
+  readonly delete = () => {
+    if (this.id) return OutlayCat.delete(this.id);
+    return false;
+  };
 }
