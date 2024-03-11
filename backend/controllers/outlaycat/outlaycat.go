@@ -114,12 +114,12 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	res := result.Dto[*uuid.UUID]{
 		Code:   0,
 		Result: id,
-		Tip:    "查询成功",
+		Tip:    "创建成功",
 		Error:  err,
 	}
 	if err != nil {
 		res.Code = code + 2
-		res.Tip = "查询失败"
+		res.Tip = "创建失败"
 		res.Return(&w, http.StatusInternalServerError)
 		return
 	}
