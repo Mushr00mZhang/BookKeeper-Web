@@ -12,7 +12,7 @@ import (
 // 支出类型
 type Dto struct {
 	outlaycat.OutlayCat
-	Outlays []outlay.Outlay // 支出列表
+	Outlays *[]outlay.Outlay `gorm:"foreignKey:CatId;references:Id"` // 支出列表
 	// Parent *outlaycat.OutlayCat `gorm:"foreignKey:Id;references:ParentId"` // 父级
 }
 
