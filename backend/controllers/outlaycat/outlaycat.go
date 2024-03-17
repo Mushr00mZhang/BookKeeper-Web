@@ -188,7 +188,7 @@ func Update(w http.ResponseWriter, r *http.Request) {
 }
 func Delete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	id, err := uuid.Parse(vars["Id"])
+	id, err := uuid.Parse(vars["id"])
 	if err != nil {
 		log.Printf("解析Id失败。\n")
 		res := result.Dto[bool]{
