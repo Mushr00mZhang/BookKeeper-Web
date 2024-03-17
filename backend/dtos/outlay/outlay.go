@@ -20,18 +20,18 @@ type CreateDto = outlay.Base
 
 // 更新支出Dto
 type UpdateDto struct {
-	Id uuid.UUID `gorm:"not null;primaryKey;"` // Id
+	Id uuid.UUID `gorm:"not null;primaryKey;" json:"id"` // Id
 	outlay.Base
 }
 
 // 获取支出列表Dto
 type ListDto struct {
-	CatId    *uuid.UUID // 类型Id
-	LowMoney *float32   // 最低金额
-	TopMoney *float32   // 最高金额
-	STime    *time.Time // 开始时间
-	ETime    *time.Time // 结束时间
-	UserId   *uuid.UUID // 用户Id
+	CatId    *uuid.UUID `json:"catId"`    // 类型Id
+	LowMoney *float32   `json:"lowMoney"` // 最低金额
+	TopMoney *float32   `json:"topMoney"` // 最高金额
+	STime    *time.Time `json:"sTime"`    // 开始时间
+	ETime    *time.Time `json:"eTime"`    // 结束时间
+	UserId   *uuid.UUID `json:"userId"`   // 用户Id
 }
 
 // 解析获取支出列表Dto

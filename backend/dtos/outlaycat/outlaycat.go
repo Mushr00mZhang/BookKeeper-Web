@@ -12,7 +12,7 @@ import (
 // 支出类型
 type Dto struct {
 	outlaycat.OutlayCat
-	Outlays *[]outlay.Outlay `gorm:"foreignKey:CatId;references:Id"` // 支出列表
+	Outlays *[]outlay.Outlay `gorm:"foreignKey:CatId;references:Id" json:"outlays"` // 支出列表
 	// Parent *outlaycat.OutlayCat `gorm:"foreignKey:Id;references:ParentId"` // 父级
 }
 
@@ -21,13 +21,13 @@ type CreateDto = outlaycat.Base
 
 // 更新支出Dto
 type UpdateDto struct {
-	Id uuid.UUID `gorm:"not null;primaryKey;"` // Id
+	Id uuid.UUID `gorm:"not null;primaryKey;" json:"id"` // Id
 	outlaycat.Base
 }
 
 // 获取支出列表Dto
 type ListDto struct {
-	ParentId *uuid.UUID // 父级Id
+	ParentId *uuid.UUID `json:"parentId"` // 父级Id
 }
 
 func ParseListDto(values url.Values) ListDto {

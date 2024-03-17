@@ -6,10 +6,10 @@ import (
 )
 
 type Dto[T any] struct {
-	Code   int8   // 状态码
-	Result T      // 结果
-	Tip    string // 提示
-	Error  error  // 错误
+	Code   int8   `json:"code"`   // 状态码
+	Result T      `json:"result"` // 结果
+	Tip    string `json:"tip"`    // 提示
+	Error  error  `json:"error"`  // 错误
 }
 
 // 返回结果

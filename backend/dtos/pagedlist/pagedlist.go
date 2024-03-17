@@ -7,18 +7,14 @@ import (
 
 // 获取分页列表Dto
 type GetDto struct {
-	// 序号
-	Index int
-	// 大小
-	Size int
+	Index int `json:"index"` // 序号
+	Size  int `json:"size"`  // 大小
 }
 
 // 分页列表Dto
 type Dto[T any] struct {
-	// 总数
-	Total int
-	// 列表
-	Items []T
+	Total int `json:"total"` // 总数
+	Items []T `json:"items"` //列表
 }
 
 func ParseGetDto(values url.Values) GetDto {
