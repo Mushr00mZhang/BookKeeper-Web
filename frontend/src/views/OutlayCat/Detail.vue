@@ -26,6 +26,8 @@ import 'element-plus/es/components/input/style/css';
 import 'element-plus/es/components/input-number/style/css';
 import 'element-plus/es/components/button/style/css';
 import { OutlayCat } from './model';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 type Props = {
   parentId: string | null;
 };
@@ -44,7 +46,8 @@ const outlaycat = ref<OutlayCat>(
     remark: '',
   })
 );
-const submit = () => {
-  outlaycat.value.create();
+const submit = async () => {
+  await outlaycat.value.create();
+  router.back();
 };
 </script>

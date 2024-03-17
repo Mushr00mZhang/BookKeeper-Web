@@ -41,7 +41,7 @@ export interface IDto extends IBase {
   /**
    * 子集列表
    */
-  children: IDto[];
+  children: IDto[] | null;
   // outlays:IDto[]
 }
 /**
@@ -87,7 +87,7 @@ export class OutlayCat implements IDto {
     this.sort = dto.sort;
     this.stable = dto.stable;
     this.remark = dto.remark;
-    this.children = dto.children.map((i) => new OutlayCat(i));
+    this.children = dto.children?.map((i) => new OutlayCat(i)) || [];
   }
   static async list(dto: IListDto) {
     const url = `/api/outlaycats`;
