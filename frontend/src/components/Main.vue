@@ -1,10 +1,10 @@
 <template>
   <RouterView #="{ Component }">
-    <Transition>
-      <KeepAlive>
+    <KeepAlive>
+      <Transition>
         <Component :is="Component" />
-      </KeepAlive>
-    </Transition>
+      </Transition>
+    </KeepAlive>
   </RouterView>
 </template>
 <script setup lang="ts">
