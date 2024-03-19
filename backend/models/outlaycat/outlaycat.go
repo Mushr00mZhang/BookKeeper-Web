@@ -2,6 +2,7 @@ package outlaycat
 
 import (
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type Base struct {
@@ -17,6 +18,18 @@ type Base struct {
 type OutlayCat struct {
 	Id uuid.UUID `gorm:"not null;primaryKey;" json:"id"` // Id
 	Base
-	Children []OutlayCat `gorm:"foreignKey:Id;references:ParentId" json:"children"` // 子级列表
+	// Children []OutlayCat `gorm:"foreignKey:Id;references:ParentId" json:"children"` // 子级列表
 	// Outlays []outlay.Outlay `gorm:"foreignKey:Id;references:CatId"` // 支出列表
+	HasChildren bool `gorm:"-:all" json:"hasChildren"`
+}
+
+func (cat *OutlayCat) AfterFind(tx *gorm.DB) (err error) {
+	res := int64(0)
+	tx.Model(&OutlayCat{Base: Base{
+		ParentId: &cat.Id,
+	}}).Where(&OutlayCat{Base: Base{
+		ParentId: &cat.Id,
+	}}).Count(&res)
+	cat.HasChildren = res > 0
+	return
 }
