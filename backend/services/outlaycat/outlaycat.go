@@ -60,7 +60,8 @@ func PagedList(db *gorm.DB, dto outlaycat.PagedListDto) (pagedlist.Dto[outlaycat
 }
 func Get(db *gorm.DB, id uuid.UUID) (*outlaycat.Dto, int8, error) {
 	var res outlaycat.Dto
-	tx := db.Model(&outlaycat_model.OutlayCat{Id: id}).First(&res)
+	filter := outlaycat_model.OutlayCat{Id: id}
+	tx := db.Model(&filter).First(&res, &filter)
 	if tx.Error != nil {
 		log.Printf("获取%s失败。%s\n", NAME, tx.Error)
 		return nil, 1, tx.Error
