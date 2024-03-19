@@ -4,10 +4,11 @@
     <div>
       {{ item.name }}
     </div>
+    <ElButton type="primary" @click="create(item)">添加</ElButton>
+    <ElButton type="primary" @click="update(item)">编辑</ElButton>
     <ElButton type="warning" @click="remove(item)">删除</ElButton>
   </div>
   <!-- <ElTree></ElTree> -->
-  <ElButton type="primary" @click="create">添加</ElButton>
 </template>
 <script setup lang="ts">
 import { reactive } from 'vue';
@@ -20,8 +21,11 @@ const route = useRoute();
 const router = useRouter();
 const dto = reactive<OutlayCatListDto>({ parentId: null });
 const items = reactive<OutlayCat[]>([]);
-const create = () => {
-  router.push('detail');
+const create = (item: OutlayCat) => {
+  router.push({ path: 'detail', query: { mode: 'create', parentId: item.id } });
+};
+const update = (item: OutlayCat) => {
+  router.push({ path: 'detail', query: { id: item.id, mode: 'update' } });
 };
 const remove = async (item: OutlayCat) => {
   await item.delete();

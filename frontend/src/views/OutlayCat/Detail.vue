@@ -14,6 +14,7 @@
     </ElFormItem>
     <ElFormItem>
       <ElButton type="primary" @click="submit">提交</ElButton>
+      <ElButton @click="cancel">取消</ElButton>
     </ElFormItem>
   </ElForm>
 </template>
@@ -26,19 +27,17 @@ import 'element-plus/es/components/input/style/css';
 import 'element-plus/es/components/input-number/style/css';
 import 'element-plus/es/components/button/style/css';
 import { OutlayCat } from './model';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
+const route = useRoute();
 const router = useRouter();
-type Props = {
-  parentId: string | null;
-};
-const props = withDefaults(defineProps<Props>(), {
-  parentId: null,
-});
+type Query = { mode: 'create'; parentId: string | null } | { id: string; mode: 'update' };
+// const { id = null, mode, parentId = null } = route.query as Query;
+const query = route.query as Query;
 const outlaycat = ref<OutlayCat>(
   new OutlayCat({
     id: null,
     children: [],
-    parentId: props.parentId,
+    parentId: null,
     name: '',
     unit: '',
     sort: 0,
@@ -47,7 +46,31 @@ const outlaycat = ref<OutlayCat>(
   })
 );
 const submit = async () => {
-  await outlaycat.value.create();
+  switch (query.mode) {
+    case 'create':
+      await outlaycat.value.create();
+      break;
+    case 'update':
+      await outlaycat.value.update();
+      break;
+  }
   router.back();
 };
+const cancel = () => {
+  router.back();
+};
+const init = async () => {
+  switch (query.mode) {
+    case 'create':
+      outlaycat.value.parentId = query.parentId;
+      break;
+    case 'update':
+      const res = await OutlayCat.get(query.id);
+      if (res) {
+        outlaycat.value = res;
+      }
+      break;
+  }
+};
+init();
 </script>
