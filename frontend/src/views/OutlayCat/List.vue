@@ -1,5 +1,5 @@
 <template>
-  列表页
+  <!-- 列表页
   <div v-for="item in items">
     <div>
       {{ item.name }}
@@ -7,8 +7,8 @@
     <ElButton type="primary" @click="create(item)">添加</ElButton>
     <ElButton type="primary" @click="update(item)">编辑</ElButton>
     <ElButton type="warning" @click="remove(item)">删除</ElButton>
-  </div>
-  <!-- <ElTree></ElTree> -->
+  </div> -->
+  <ElTree lazy :load="load" :props="treeProps" node-key="id" />
 </template>
 <script setup lang="ts">
 import { reactive } from 'vue';
@@ -17,10 +17,25 @@ import { OutlayCat, IListDto as OutlayCatListDto } from './model';
 import { ElTree, ElButton } from 'element-plus';
 import 'element-plus/es/components/tree/style/css';
 import 'element-plus/es/components/button/style/css';
+import {
+  LoadFunction,
+  TreeData,
+  TreeOptionProps,
+} from 'element-plus/es/components/tree/src/tree.type.mjs';
+import Node from 'element-plus/es/components/tree/src/model/node';
 const route = useRoute();
 const router = useRouter();
 const dto = reactive<OutlayCatListDto>({ parentId: null });
 const items = reactive<OutlayCat[]>([]);
+const treeProps: TreeOptionProps = {
+  label: 'name',
+  isLeaf: (data, _node) => !(data as OutlayCat).hasChildren,
+};
+const load: LoadFunction = async (node: Node, resolve: (data: TreeData) => void) => {
+  const parentId = node.level === 0 ? null : (node.data as OutlayCat).id;
+  const items = await OutlayCat.list({ parentId });
+  resolve(items);
+};
 const create = (item: OutlayCat) => {
   router.push({ path: 'detail', query: { mode: 'create', parentId: item.id } });
 };

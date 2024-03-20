@@ -34,23 +34,19 @@ export interface IBase {
  * 支出类型Dto
  */
 export interface IDto extends IBase {
-  /**
-   * 主键id
-   */
+  /** 主键id */
   id: string | null;
-  /**
-   * 子集列表
-   */
-  children: IDto[] | null;
+  /** 是否含有子集 */
+  hasChildren: boolean;
+  // /**
+  //  * 子集列表
+  //  */
+  // children: IDto[] | null;
   // outlays:IDto[]
 }
-/**
- * 支出类型创建Dto
- */
+/** 支出类型创建Dto */
 export interface ICreateDto extends IBase {}
-/**
- * 支出类型更新Dto
- */
+/** 支出类型更新Dto */
 export interface IUpdateDto extends IBase {
   /**
    * 主键id
@@ -78,6 +74,7 @@ export class OutlayCat implements IDto {
   sort: number = 0;
   stable: boolean = false;
   remark: string = '';
+  hasChildren: boolean = false;
   children: OutlayCat[] = [];
   constructor(dto: IDto) {
     this.id = dto.id;
@@ -87,7 +84,8 @@ export class OutlayCat implements IDto {
     this.sort = dto.sort;
     this.stable = dto.stable;
     this.remark = dto.remark;
-    this.children = dto.children?.map((i) => new OutlayCat(i)) || [];
+    this.hasChildren = dto.hasChildren;
+    // this.children = dto?.children?.map((i) => new OutlayCat(i)) || [];
   }
   static async list(dto: IListDto) {
     const url = `/api/outlaycats`;
