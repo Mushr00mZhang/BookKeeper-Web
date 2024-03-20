@@ -32,7 +32,7 @@ type ListDto struct {
 
 func ParseListDto(values url.Values) ListDto {
 	dto := ListDto{}
-	parentId, err := uuid.Parse(values.Get("ParentId"))
+	parentId, err := uuid.Parse(values.Get("parentId"))
 	if err == nil {
 		dto.ParentId = &parentId
 	}

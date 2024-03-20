@@ -15,9 +15,9 @@ const TABLE = "outlay_cats"
 const NAME = "支出类型"
 
 func FilterList(tx *gorm.DB, dto outlaycat.ListDto) *gorm.DB {
-	if dto.ParentId != nil && *dto.ParentId != uuid.Nil {
-		tx = tx.Where("Parent = ?", dto.ParentId)
-	}
+	tx = tx.Where(map[string]interface{}{
+		"parent_id": dto.ParentId,
+	})
 	return tx
 }
 func List(db *gorm.DB, dto outlaycat.ListDto) ([]outlaycat.Dto, int8, error) {
