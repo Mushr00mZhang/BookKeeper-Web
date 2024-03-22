@@ -8,13 +8,21 @@
     <ElButton type="primary" @click="update(item)">编辑</ElButton>
     <ElButton type="warning" @click="remove(item)">删除</ElButton>
   </div> -->
-  <ElTree lazy :load="load" :props="treeProps" node-key="id" />
+  <ElTree lazy :load="load" :props="treeProps" node-key="id">
+    <template #default="{ data: item }: { node: Node, data: OutlayCat }">
+      <label>{{ item.name }}</label>
+      <ElButton type="success" @click="create(item)" :icon="Plus" size="small" />
+      <ElButton type="primary" @click="update(item)" :icon="Edit" size="small" />
+      <ElButton type="danger" @click="remove(item)" :icon="Delete" size="small" />
+    </template>
+  </ElTree>
 </template>
 <script setup lang="ts">
 import { reactive } from 'vue';
 import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 import { OutlayCat, IListDto as OutlayCatListDto } from './model';
 import { ElTree, ElButton } from 'element-plus';
+import { Plus, Edit, Delete } from '@element-plus/icons-vue';
 import 'element-plus/es/components/tree/style/css';
 import 'element-plus/es/components/button/style/css';
 import {
