@@ -1,8 +1,8 @@
 <template>
-  <ElForm>
+  <ElForm v-model="item">
     <ElFormItem label="父级">
       <ElTreeSelect
-        v-model="outlaycat.parentId"
+        v-model="item.parentId"
         :load="load"
         :props="treeProps"
         :default-expanded-keys="parentIds"
@@ -14,16 +14,19 @@
       />
     </ElFormItem>
     <ElFormItem label="名称">
-      <ElInput v-model="outlaycat.name" />
+      <ElInput v-model="item.name" />
     </ElFormItem>
     <ElFormItem label="单位">
-      <ElInput v-model="outlaycat.unit" />
+      <ElInput v-model="item.unit" />
     </ElFormItem>
     <ElFormItem label="排序">
-      <ElInputNumber v-model="outlaycat.sort" />
+      <ElInputNumber v-model="item.sort" />
+    </ElFormItem>
+    <ElFormItem label="固定">
+      <ElCheckbox v-model="item.stable" />
     </ElFormItem>
     <ElFormItem label="备注">
-      <ElInput v-model="outlaycat.remark" />
+      <ElInput v-model="item.remark" />
     </ElFormItem>
     <ElFormItem>
       <ElButton type="primary" @click="submit">提交</ElButton>
@@ -41,6 +44,7 @@ import {
   ElInput,
   ElInputNumber,
   ElButton,
+  ElCheckbox,
   ElMessage,
 } from 'element-plus';
 import {
@@ -72,14 +76,14 @@ const load: LoadFunction = async (node: Node, resolve: (data: TreeData) => void)
     default:
       const parentId = (node.data as OutlayCat).id;
       const items = await OutlayCat.list({ parentId });
-      resolve(items.filter((i) => i.id !== outlaycat.value.id));
+      resolve(items.filter((i) => i.id !== item.value.id));
       break;
   }
 };
 const parentIds = reactive<string[]>([ROOT_ID]);
-const outlaycat = ref<OutlayCat>(
+const item = ref<OutlayCat>(
   new OutlayCat({
-    id: null,
+    id: undefined,
     // children: [],
     parentId: '',
     name: '',
@@ -93,18 +97,18 @@ const outlaycat = ref<OutlayCat>(
 const submit = async () => {
   switch (query.mode) {
     case 'create':
-      const id = await outlaycat.value.create();
+      const id = await item.value.create();
       if (id) {
-        emit('created', outlaycat.value);
+        emit('created', item.value);
         ElMessage.success('创建成功');
       } else {
         ElMessage.error('创建失败');
       }
       break;
     case 'update':
-      const res = await outlaycat.value.update();
+      const res = await item.value.update();
       if (res) {
-        emit('updated', outlaycat.value);
+        emit('updated', item.value);
         ElMessage.success('更新成功');
       } else {
         ElMessage.error('更新失败');
@@ -124,7 +128,7 @@ const init = async () => {
         parentIds.splice(1);
         parentIds.push(...ids.slice(1));
       }
-      outlaycat.value.parentId = query.parentId;
+      item.value.parentId = query.parentId;
       break;
     case 'update':
       const res = await OutlayCat.get(query.id);
@@ -134,7 +138,7 @@ const init = async () => {
           parentIds.splice(1);
           parentIds.push(...ids.slice(1));
         }
-        outlaycat.value = res;
+        item.value = res;
       }
       break;
   }

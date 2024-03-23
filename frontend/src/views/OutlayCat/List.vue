@@ -1,5 +1,12 @@
 <template>
-  <ElTree :load="load" :props="treeProps" :default-expanded-keys="[ROOT_ID]" node-key="id" lazy>
+  <ElTree
+    :load="load"
+    :props="treeProps"
+    :default-expanded-keys="[ROOT_ID]"
+    node-key="id"
+    lazy
+    ref="treeRef"
+  >
     <template #default="{ node, data: item }: { node: Node, data: OutlayCat }">
       <label>{{ item.name }}</label>
       <ElButton type="success" @click="create(item)" :icon="Plus" circle />
@@ -11,9 +18,9 @@
   </ElTree>
 </template>
 <script setup lang="ts">
-import { reactive } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { ElTree, ElButton, ElMessage, ElMessageBox } from 'element-plus';
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { ElTree, ElButton, ElMessage, ElMessageBox, TreeInstance } from 'element-plus';
 import { Plus, Edit, Delete } from '@element-plus/icons-vue';
 import {
   LoadFunction,
@@ -24,12 +31,12 @@ import Node from 'element-plus/es/components/tree/src/model/node';
 import 'element-plus/es/components/tree/style/css';
 import 'element-plus/es/components/button/style/css';
 import { OutlayCat, ROOT, ROOT_ID } from './model';
-// const route = useRoute();
 const router = useRouter();
 const treeProps: TreeOptionProps = {
   label: 'name',
   isLeaf: (data, _node) => !(data as OutlayCat).hasChildren,
 };
+const treeRef = ref<TreeInstance>();
 const load: LoadFunction = async (node: Node, resolve: (data: TreeData) => void) => {
   switch (node.level) {
     case 0:
@@ -60,6 +67,11 @@ const remove = async (item: OutlayCat) => {
     const res = await item.delete();
     if (res) {
       ElMessage.success('删除成功');
+      const tree = treeRef.value;
+      if (tree) {
+        const node = tree.getNode(item?.id || '');
+        tree.remove(node);
+      }
     } else {
       ElMessage.error('删除失败');
     }

@@ -1,81 +1,64 @@
 import * as PagedList from '@/utils/PagedList';
 import { Result } from '@/utils/Result';
 import axios from 'axios';
-/**
- * 支出类型基础
- */
+/** 支出类型基础 */
 export interface IBase {
-  /**
-   * 父级Id
-   */
+  /** 父级Id */
   parentId: string;
-  /**
-   * 名称
-   */
+  /** 名称 */
   name: string;
-  /**
-   * 单位
-   */
+  /** 单位 */
   unit: string;
-  /**
-   * 排序
-   */
+  /** 排序 */
   sort: number;
-  /**
-   * 是否固定
-   */
+  /** 是否固定 */
   stable: boolean;
-  /**
-   * 备注
-   */
+  /** 备注 */
   remark: string;
 }
-/**
- * 支出类型Dto
- */
-export interface IDto extends IBase {
+/** 支出模型 */
+export interface IModel extends IBase {
   /** 主键id */
-  id: string | null;
+  id?: string;
+}
+/** 支出类型Dto */
+export interface IDto extends IModel {
   /** 是否含有子集 */
   hasChildren: boolean;
   // /**
   //  * 子集列表
   //  */
   // children: IDto[] | null;
-  // outlays:IDto[]
+  // /** 支出列表 */
+  // outlays: IDto[];
 }
 /** 支出类型创建Dto */
-export interface ICreateDto extends IBase {}
+export interface ICreateDto extends IModel {
+  id: undefined;
+}
 /** 支出类型更新Dto */
-export interface IUpdateDto extends IBase {
-  /**
-   * 主键id
-   */
+export interface IUpdateDto extends IModel {
   id: string;
 }
-/**
- * 支出类型列表Dto
- */
+/** 支出类型列表Dto */
 export interface IListDto {
+  /** 父级Id */
   parentId?: string | null;
 }
-/**
- * 支出类型分页列表Dto
- */
+/** 支出类型分页列表Dto */
 export interface IPagedListDto extends IListDto, PagedList.IGetDto {}
-/**
- * 支出类型
- */
+/** 支出类型 */
 export class OutlayCat implements IDto {
-  id: string | null = null;
-  parentId: string = ROOT_ID;
-  name: string = '';
-  unit: string = '';
-  sort: number = 0;
-  stable: boolean = false;
-  remark: string = '';
-  hasChildren: boolean = false;
-  children: OutlayCat[] = [];
+  id?: string;
+  parentId = ROOT_ID;
+  name = '';
+  unit = '';
+  sort = 0;
+  stable = false;
+  remark = '';
+  hasChildren = false;
+  // children: OutlayCat[] = [];
+  // override outlays: string;
   constructor(dto: IDto) {
     this.id = dto.id;
     this.parentId = dto.parentId;
