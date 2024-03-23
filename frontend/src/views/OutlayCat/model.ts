@@ -8,7 +8,7 @@ export interface IBase {
   /**
    * 父级Id
    */
-  parentId: string | null;
+  parentId: string;
   /**
    * 名称
    */
@@ -68,7 +68,7 @@ export interface IPagedListDto extends IListDto, PagedList.IGetDto {}
  */
 export class OutlayCat implements IDto {
   id: string | null = null;
-  parentId: string | null = null;
+  parentId: string = ROOT_ID;
   name: string = '';
   unit: string = '';
   sort: number = 0;
@@ -87,12 +87,12 @@ export class OutlayCat implements IDto {
     this.hasChildren = dto.hasChildren;
     // this.children = dto?.children?.map((i) => new OutlayCat(i)) || [];
   }
-  static async list(dto: IListDto) {
+  static readonly list = async (dto: IListDto) => {
     const url = `/api/outlaycats`;
     const res = await axios.get<Result<IDto[]>>(url, { params: dto });
     return (res.data.result || []).map((i) => new OutlayCat(i));
-  }
-  static async pagedlist(dto: IPagedListDto) {
+  };
+  static readonly pagedlist = async (dto: IPagedListDto) => {
     const url = `/api/outlaycats`;
     const res = await axios.get<Result<PagedList.IDto<IDto>>>(url, { params: dto });
     const items = (res.data.result?.items || []).map((i) => new OutlayCat(i));
@@ -100,30 +100,37 @@ export class OutlayCat implements IDto {
       total: res.data.result?.total || 0,
       items,
     } as PagedList.IDto<IDto>;
-  }
-  static async get(id: string) {
+  };
+  static readonly get = async (id: string) => {
     const url = `/api/outlaycats/${id}`;
     const res = await axios.get<Result<IDto>>(url);
     return (res.data.result && new OutlayCat(res.data.result)) || null;
-  }
-  static async create(dto: ICreateDto) {
+  };
+  static readonly create = async (dto: ICreateDto) => {
     const url = `/api/outlaycats`;
     const res = await axios.post<Result<string>>(url, dto);
     return res.data.result;
-  }
-  static async update(dto: IUpdateDto) {
+  };
+  static readonly update = async (dto: IUpdateDto) => {
     const url = `/api/outlaycats/${dto.id}`;
     const res = await axios.put<Result<boolean>>(url, dto);
     return res.data.result;
-  }
-  static async delete(id: string) {
+  };
+  static readonly delete = async (id: string) => {
     const url = `/api/outlaycats/${id}`;
     const res = await axios.delete<Result<boolean>>(url);
     return res.data.result;
-  }
+  };
+  static readonly getParentIds = async (parentId: string): Promise<string[]> => {
+    if (parentId === ROOT_ID) return [parentId];
+    const cat = await OutlayCat.get(parentId);
+    if (cat) return [parentId, ...(await OutlayCat.getParentIds(cat.parentId))];
+    return [parentId];
+  };
   readonly create = async () => {
-    this.id = await OutlayCat.create(this as ICreateDto);
-    return this.id;
+    const id = await OutlayCat.create(this as ICreateDto);
+    if (id) this.id = id;
+    return id;
   };
   readonly update = () => {
     if (this.id) return OutlayCat.update(this as IUpdateDto);
@@ -133,4 +140,17 @@ export class OutlayCat implements IDto {
     if (this.id) return OutlayCat.delete(this.id);
     return false;
   };
+  readonly getParentIds = async () => OutlayCat.getParentIds(this.parentId);
 }
+export const ROOT_ID = '00000000-0000-0000-0000-000000000000';
+export const ROOT = new OutlayCat({
+  id: ROOT_ID,
+  parentId: '',
+  name: '根目录',
+  unit: '',
+  sort: 0,
+  stable: false,
+  remark: '',
+  hasChildren: true,
+  // children: [],
+});

@@ -1,3 +1,9 @@
+:root {
+  --el-tree-node-content-height: 0.4rem;
+  .el-tree {
+    --el-tree-node-content-height: 0.4rem;
+  }
+}
 * {
   box-sizing: border-box;
 }

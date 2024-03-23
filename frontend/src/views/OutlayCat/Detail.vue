@@ -1,5 +1,18 @@
 <template>
   <ElForm>
+    <ElFormItem label="父级">
+      <ElTreeSelect
+        v-model="outlaycat.parentId"
+        :load="load"
+        :props="treeProps"
+        :default-expanded-keys="parentIds"
+        node-key="id"
+        value-key="id"
+        lazy
+        check-strictly
+        filterable
+      />
+    </ElFormItem>
     <ElFormItem label="名称">
       <ElInput v-model="outlaycat.name" />
     </ElFormItem>
@@ -19,39 +32,83 @@
   </ElForm>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue';
-import { ElForm, ElFormItem, ElInput, ElInputNumber, ElButton } from 'element-plus';
+import { ref, reactive } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import {
+  ElForm,
+  ElFormItem,
+  ElTreeSelect,
+  ElInput,
+  ElInputNumber,
+  ElButton,
+  ElMessage,
+} from 'element-plus';
+import {
+  LoadFunction,
+  TreeData,
+  TreeOptionProps,
+} from 'element-plus/es/components/tree/src/tree.type.mjs';
+import Node from 'element-plus/es/components/tree/src/model/node';
+import 'element-plus/es/components/tree/style/css';
 import 'element-plus/es/components/form/style/css';
 import 'element-plus/es/components/form-item/style/css';
 import 'element-plus/es/components/input/style/css';
 import 'element-plus/es/components/input-number/style/css';
 import 'element-plus/es/components/button/style/css';
-import { OutlayCat } from './model';
-import { useRoute, useRouter } from 'vue-router';
+import { OutlayCat, ROOT, ROOT_ID } from './model';
 const route = useRoute();
 const router = useRouter();
-type Query = { mode: 'create'; parentId: string | null } | { id: string; mode: 'update' };
-// const { id = null, mode, parentId = null } = route.query as Query;
+type Query = { mode: 'create'; parentId: string } | { id: string; mode: 'update' };
 const query = route.query as Query;
+const treeProps: TreeOptionProps = {
+  label: 'name',
+  isLeaf: (data, _node) => !(data as OutlayCat).hasChildren,
+};
+const load: LoadFunction = async (node: Node, resolve: (data: TreeData) => void) => {
+  switch (node.level) {
+    case 0:
+      resolve([ROOT]);
+      break;
+    default:
+      const parentId = (node.data as OutlayCat).id;
+      const items = await OutlayCat.list({ parentId });
+      resolve(items.filter((i) => i.id !== outlaycat.value.id));
+      break;
+  }
+};
+const parentIds = reactive<string[]>([ROOT_ID]);
 const outlaycat = ref<OutlayCat>(
   new OutlayCat({
     id: null,
-    children: [],
-    parentId: null,
+    // children: [],
+    parentId: '',
     name: '',
     unit: '',
     sort: 0,
     stable: false,
     remark: '',
+    hasChildren: false,
   })
 );
 const submit = async () => {
   switch (query.mode) {
     case 'create':
-      await outlaycat.value.create();
+      const id = await outlaycat.value.create();
+      if (id) {
+        emit('created', outlaycat.value);
+        ElMessage.success('创建成功');
+      } else {
+        ElMessage.error('创建失败');
+      }
       break;
     case 'update':
-      await outlaycat.value.update();
+      const res = await outlaycat.value.update();
+      if (res) {
+        emit('updated', outlaycat.value);
+        ElMessage.success('更新成功');
+      } else {
+        ElMessage.error('更新失败');
+      }
       break;
   }
   router.back();
@@ -62,15 +119,30 @@ const cancel = () => {
 const init = async () => {
   switch (query.mode) {
     case 'create':
+      if (query.parentId) {
+        const ids = await OutlayCat.getParentIds(query.parentId);
+        parentIds.splice(1);
+        parentIds.push(...ids.slice(1));
+      }
       outlaycat.value.parentId = query.parentId;
       break;
     case 'update':
       const res = await OutlayCat.get(query.id);
       if (res) {
+        if (res.parentId) {
+          const ids = await OutlayCat.getParentIds(res.parentId);
+          parentIds.splice(1);
+          parentIds.push(...ids.slice(1));
+        }
         outlaycat.value = res;
       }
       break;
   }
 };
+type Emits = {
+  created: [item: OutlayCat];
+  updated: [item: OutlayCat];
+};
+const emit = defineEmits<Emits>();
 init();
 </script>
