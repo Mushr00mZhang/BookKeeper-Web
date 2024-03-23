@@ -1,14 +1,14 @@
 <template>
   <RouterView #="{ Component }">
-    <KeepAlive>
-      <Transition>
+    <Transition>
+      <KeepAlive>
         <Component :is="Component" />
-      </Transition>
-    </KeepAlive>
+      </KeepAlive>
+    </Transition>
   </RouterView>
 </template>
 <script setup lang="ts">
-import { RouterView, useRouter } from 'vue-router';
-const router = useRouter();
-console.log(router);
+import { RouterView } from 'vue-router';
+// const router = useRouter();
+// console.log(router);
 </script>
