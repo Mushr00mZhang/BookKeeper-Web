@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// 支出类型
+// 支出类型Dto
 type Dto struct {
 	outlaycat.OutlayCat
 	Outlays *[]outlay.Outlay `gorm:"foreignKey:CatId;references:Id" json:"outlays"` // 支出列表
@@ -30,6 +30,7 @@ type ListDto struct {
 	ParentId *uuid.UUID `json:"parentId"` // 父级Id
 }
 
+// 解析获取支出列表Dto
 func ParseListDto(values url.Values) ListDto {
 	dto := ListDto{}
 	parentId, err := uuid.Parse(values.Get("parentId"))
@@ -45,6 +46,7 @@ type PagedListDto struct {
 	ListDto
 }
 
+// 解析获取支出分页列表Dto
 func ParsePagedListDto(values url.Values) PagedListDto {
 	return PagedListDto{
 		GetDto:  pagedlist.ParseGetDto(values),
