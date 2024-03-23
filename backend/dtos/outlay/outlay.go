@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"time"
 
+	outlay_base "bookkeeper-backend/bases/outlay"
 	"bookkeeper-backend/dtos/pagedlist"
 	"bookkeeper-backend/models/outlay"
 	"bookkeeper-backend/utils"
@@ -16,13 +17,10 @@ import (
 type Dto = outlay.Outlay
 
 // 创建支出Dto
-type CreateDto = outlay.Base
+type CreateDto = outlay_base.Props
 
 // 更新支出Dto
-type UpdateDto struct {
-	Id uuid.UUID `gorm:"not null;primaryKey;" json:"id"` // Id
-	outlay.Base
-}
+type UpdateDto = outlay_base.Base
 
 // 获取支出列表Dto
 type ListDto struct {

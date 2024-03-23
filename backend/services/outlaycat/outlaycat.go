@@ -1,6 +1,7 @@
 package outlaycat
 
 import (
+	outlaycat_base "bookkeeper-backend/bases/outlaycat"
 	"bookkeeper-backend/dtos/outlaycat"
 	"bookkeeper-backend/dtos/pagedlist"
 	outlaycat_model "bookkeeper-backend/models/outlaycat"
@@ -22,7 +23,7 @@ func FilterList(tx *gorm.DB, dto outlaycat.ListDto) *gorm.DB {
 }
 func List(db *gorm.DB, dto outlaycat.ListDto) ([]outlaycat.Dto, int8, error) {
 	var res []outlaycat.Dto
-	tx := db.Model(&outlaycat_model.OutlayCat{})
+	tx := db.Model(&outlaycat_model.OutlayCat{}).Preload("Parent").Preload("Children").Preload("Outlays")
 	tx = FilterList(tx, dto).Find(&res)
 	if tx.Error != nil {
 		log.Printf("获取%s列表失败。%s\n", NAME, tx.Error)
@@ -49,7 +50,7 @@ func PagedList(db *gorm.DB, dto outlaycat.PagedListDto) (pagedlist.Dto[outlaycat
 	if total == 0 {
 		return res, 0, nil
 	}
-	tx := db.Model(&outlaycat_model.OutlayCat{})
+	tx := db.Model(&outlaycat_model.OutlayCat{}).Preload("Parent").Preload("Children").Preload("Outlays")
 	tx = FilterList(tx, dto.ListDto).Offset(dto.Index * dto.Size).Limit(dto.Size).Find(&res.Items)
 	if tx.Error != nil {
 		log.Printf("获取%s分页列表失败。%s\n", NAME, tx.Error)
@@ -60,8 +61,8 @@ func PagedList(db *gorm.DB, dto outlaycat.PagedListDto) (pagedlist.Dto[outlaycat
 }
 func Get(db *gorm.DB, id uuid.UUID) (*outlaycat.Dto, int8, error) {
 	var res outlaycat.Dto
-	filter := outlaycat_model.OutlayCat{Id: id}
-	tx := db.Model(&filter).First(&res, &filter)
+	filter := outlaycat_model.OutlayCat{Base: outlaycat_base.Base{Id: id}}
+	tx := db.Model(&filter).Preload("Parent").Preload("Children").Preload("Outlays").First(&res, &filter)
 	if tx.Error != nil {
 		log.Printf("获取%s失败。%s\n", NAME, tx.Error)
 		return nil, 1, tx.Error
@@ -70,8 +71,10 @@ func Get(db *gorm.DB, id uuid.UUID) (*outlaycat.Dto, int8, error) {
 }
 func Create(db *gorm.DB, dto outlaycat.CreateDto) (*uuid.UUID, int8, error) {
 	dumplicate := outlaycat_model.OutlayCat{
-		Base: outlaycat_model.Base{
-			Name: dto.Name,
+		Base: outlaycat_base.Base{
+			Props: outlaycat_base.Props{
+				Name: dto.Name,
+			},
 		},
 	}
 	tx := db.Where(&dumplicate).First(&dumplicate)
@@ -83,8 +86,10 @@ func Create(db *gorm.DB, dto outlaycat.CreateDto) (*uuid.UUID, int8, error) {
 		return nil, 2, tx.Error
 	}
 	model := outlaycat_model.OutlayCat{
-		Base: dto,
-		Id:   uuid.New(),
+		Base: outlaycat_base.Base{
+			Id:    uuid.New(),
+			Props: dto,
+		},
 	}
 	tx = db.Create(&model)
 	if tx.Error != nil {
@@ -95,8 +100,10 @@ func Create(db *gorm.DB, dto outlaycat.CreateDto) (*uuid.UUID, int8, error) {
 }
 func Update(db *gorm.DB, dto outlaycat.UpdateDto) (bool, int8, error) {
 	dumplicate := outlaycat_model.OutlayCat{
-		Base: outlaycat_model.Base{
-			Name: dto.Name,
+		Base: outlaycat_base.Base{
+			Props: outlaycat_base.Props{
+				Name: dto.Name,
+			},
 		},
 	}
 	tx := db.Not("Id = ?", dto.Id).Where(&dumplicate).First(&dumplicate)
@@ -108,8 +115,7 @@ func Update(db *gorm.DB, dto outlaycat.UpdateDto) (bool, int8, error) {
 		return false, 2, tx.Error
 	}
 	model := outlaycat_model.OutlayCat{
-		Base: dto.Base,
-		Id:   dto.Id,
+		Base: dto,
 	}
 	tx = db.Omit("Id").Updates(&model)
 	if tx.Error != nil {
@@ -119,7 +125,7 @@ func Update(db *gorm.DB, dto outlaycat.UpdateDto) (bool, int8, error) {
 	return true, 0, nil
 }
 func Delete(db *gorm.DB, id uuid.UUID) (bool, int8, error) {
-	tx := db.Delete(&outlaycat_model.OutlayCat{Id: id})
+	tx := db.Delete(&outlaycat_model.OutlayCat{Base: outlaycat_base.Base{Id: id}})
 	if tx.Error != nil {
 		log.Printf("删除%s失败。%s\n", NAME, tx.Error)
 		return false, 1, tx.Error

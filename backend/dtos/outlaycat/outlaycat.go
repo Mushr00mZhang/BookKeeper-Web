@@ -1,8 +1,8 @@
 package outlaycat
 
 import (
+	outlaycat_base "bookkeeper-backend/bases/outlaycat"
 	"bookkeeper-backend/dtos/pagedlist"
-	"bookkeeper-backend/models/outlay"
 	"bookkeeper-backend/models/outlaycat"
 	"net/url"
 
@@ -10,20 +10,13 @@ import (
 )
 
 // 支出类型Dto
-type Dto struct {
-	outlaycat.OutlayCat
-	Outlays *[]outlay.Outlay `gorm:"foreignKey:CatId;references:Id" json:"outlays"` // 支出列表
-	// Parent *outlaycat.OutlayCat `gorm:"foreignKey:Id;references:ParentId"` // 父级
-}
+type Dto = outlaycat.OutlayCat
 
 // 创建支出Dto
-type CreateDto = outlaycat.Base
+type CreateDto = outlaycat_base.Props
 
 // 更新支出Dto
-type UpdateDto struct {
-	Id uuid.UUID `gorm:"not null;primaryKey;" json:"id"` // Id
-	outlaycat.Base
-}
+type UpdateDto = outlaycat_base.Base
 
 // 获取支出列表Dto
 type ListDto struct {

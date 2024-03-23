@@ -1,6 +1,7 @@
 package outlay
 
 import (
+	outlay_base "bookkeeper-backend/bases/outlay"
 	"bookkeeper-backend/dtos/outlay"
 	"bookkeeper-backend/dtos/pagedlist"
 	outlay_model "bookkeeper-backend/models/outlay"
@@ -15,28 +16,28 @@ const NAME = "支出"
 
 func FilterList(tx *gorm.DB, dto outlay.ListDto) *gorm.DB {
 	if dto.CatId != nil {
-		tx = tx.Where("CatId = ?", dto.CatId)
+		tx = tx.Where("cat_id = ?", dto.CatId)
 	}
 	if dto.LowMoney != nil {
-		tx.Where("Money >= ?", dto.LowMoney)
+		tx.Where("money >= ?", dto.LowMoney)
 	}
 	if dto.TopMoney != nil {
-		tx.Where("Money <= ?", dto.TopMoney)
+		tx.Where("money <= ?", dto.TopMoney)
 	}
 	if dto.STime != nil {
-		tx.Where("Date >= ?", dto.STime)
+		tx.Where("date >= ?", dto.STime)
 	}
 	if dto.ETime != nil {
-		tx.Where("Date < ?", dto.ETime)
+		tx.Where("date < ?", dto.ETime)
 	}
 	if dto.UserId != nil {
-		tx = tx.Where("UserId = ?", dto.UserId)
+		tx = tx.Where("user_id = ?", dto.UserId)
 	}
 	return tx
 }
 func List(db *gorm.DB, dto outlay.ListDto) ([]outlay.Dto, int8, error) {
 	var res []outlay.Dto
-	tx := db.Model(&outlay_model.Outlay{})
+	tx := db.Model(&outlay_model.Outlay{}).Preload("Cat")
 	tx = FilterList(tx, dto).Find(&res)
 	if tx.Error != nil {
 		log.Printf("获取%s列表失败。%s\n", NAME, tx.Error)
@@ -63,7 +64,7 @@ func PagedList(db *gorm.DB, dto outlay.PagedListDto) (pagedlist.Dto[outlay.Dto],
 	if total == 0 {
 		return res, 0, nil
 	}
-	tx := db.Model(&outlay_model.Outlay{})
+	tx := db.Model(&outlay_model.Outlay{}).Preload("Cat")
 	tx = FilterList(tx, dto.ListDto).Offset(dto.Index * dto.Size).Limit(dto.Size).Find(&res.Items)
 	if tx.Error != nil {
 		log.Printf("获取%s分页列表失败。%s\n", NAME, tx.Error)
@@ -74,7 +75,8 @@ func PagedList(db *gorm.DB, dto outlay.PagedListDto) (pagedlist.Dto[outlay.Dto],
 }
 func Get(db *gorm.DB, id uuid.UUID) (*outlay.Dto, int8, error) {
 	var res outlay.Dto
-	tx := db.Model(&outlay_model.Outlay{Id: id}).First(&res)
+	filter := outlay_model.Outlay{Base: outlay_base.Base{Id: id}}
+	tx := db.Model(&filter).Preload("Cat").First(&res, &filter)
 	if tx.Error != nil {
 		log.Printf("获取%s失败。%s\n", NAME, tx.Error)
 		return nil, 1, tx.Error
@@ -83,8 +85,10 @@ func Get(db *gorm.DB, id uuid.UUID) (*outlay.Dto, int8, error) {
 }
 func Create(db *gorm.DB, dto outlay.CreateDto) (*uuid.UUID, int8, error) {
 	model := outlay_model.Outlay{
-		Base: dto,
-		Id:   uuid.New(),
+		Base: outlay_base.Base{
+			Id:    uuid.New(),
+			Props: dto,
+		},
 	}
 	tx := db.Create(&model)
 	if tx.Error != nil {
@@ -95,8 +99,7 @@ func Create(db *gorm.DB, dto outlay.CreateDto) (*uuid.UUID, int8, error) {
 }
 func Update(db *gorm.DB, dto outlay.UpdateDto) (bool, int8, error) {
 	model := outlay_model.Outlay{
-		Base: dto.Base,
-		Id:   dto.Id,
+		Base: dto,
 	}
 	tx := db.Omit("Id").Updates(&model)
 	if tx.Error != nil {
@@ -106,7 +109,7 @@ func Update(db *gorm.DB, dto outlay.UpdateDto) (bool, int8, error) {
 	return true, 0, nil
 }
 func Delete(db *gorm.DB, id uuid.UUID) (bool, int8, error) {
-	tx := db.Delete(&outlay_model.Outlay{Id: id})
+	tx := db.Delete(&outlay_model.Outlay{Base: outlay_base.Base{Id: id}})
 	if tx.Error != nil {
 		log.Printf("删除%s失败。%s\n", NAME, tx.Error)
 		return false, 1, tx.Error
