@@ -34,7 +34,7 @@ func List(w http.ResponseWriter, r *http.Request) {
 		Tip:    "查询成功",
 		Error:  err,
 	}
-	if err == nil {
+	if err != nil {
 		res.Tip = "查询失败"
 		res.Return(&w, http.StatusInternalServerError)
 		return
