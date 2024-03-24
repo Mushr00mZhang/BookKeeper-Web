@@ -8,12 +8,13 @@
         v-model="item.catId"
         :load="load"
         :props="treeProps"
-        :default-expanded-keys="parentIds"
+        :default-expanded-keys="[...expandedIds]"
         node-key="id"
         value-key="id"
         lazy
         check-strictly
         filterable
+        ref="treeRef"
       />
     </ElFormItem>
     <ElFormItem label="金额">
@@ -29,7 +30,12 @@
       <ElInput v-model="item.unit" />
     </ElFormItem>
     <ElFormItem label="时间">
-      <ElDatePicker v-model="item.time" type="datetime" />
+      <ElDatePicker
+        v-model="item.time"
+        type="datetime"
+        format="YYYY-MM-DD HH:mm:ss"
+        value-format="YYYY-MM-DDTHH:mm:ss+08:00"
+      />
     </ElFormItem>
     <ElFormItem label="用户">
       <ElSelect v-model="item.userId">
@@ -44,7 +50,7 @@
 </template>
 <script setup lang="ts">
 import '@/utils/Date';
-import { ref, reactive } from 'vue';
+import { ref, reactive, onActivated } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import {
   ElForm,
@@ -57,6 +63,7 @@ import {
   ElMessage,
   ElSelect,
   ElOption,
+  TreeInstance,
 } from 'element-plus';
 import {
   LoadFunction,
@@ -75,11 +82,13 @@ import { OutlayCat, ROOT, ROOT_ID } from '@/views/OutlayCat/model';
 const route = useRoute();
 const router = useRouter();
 type Query = { mode: 'create' } | { id: string; mode: 'update' };
-const query = route.query as Query;
+const query = ref(route.query as Query);
 const treeProps: TreeOptionProps = {
   label: 'name',
-  isLeaf: (data, _node) => !(data as OutlayCat).hasChildren,
+  isLeaf: (data, _node) => !(data as OutlayCat)?.hasChildren,
+  disabled: (_data, node) => node?.level <= 1,
 };
+const treeRef = ref<TreeInstance>();
 const load: LoadFunction = async (node: Node, resolve: (data: TreeData) => void) => {
   switch (node.level) {
     case 0:
@@ -92,7 +101,7 @@ const load: LoadFunction = async (node: Node, resolve: (data: TreeData) => void)
       break;
   }
 };
-const parentIds = reactive<string[]>([ROOT_ID]);
+const expandedIds = reactive(new Set([ROOT_ID]));
 const item = ref<Outlay>(
   new Outlay({
     id: undefined,
@@ -115,38 +124,86 @@ const item = ref<Outlay>(
   })
 );
 const submit = async () => {
-  switch (query.mode) {
+  switch (query.value.mode) {
     case 'create':
       const id = await item.value.create();
       if (id) {
         emit('created', item.value);
         ElMessage.success('创建成功');
+        router.back();
       } else {
         ElMessage.error('创建失败');
       }
       break;
     case 'update':
       const res = await item.value.update();
-      if (res) {
+      if (res.result) {
         emit('updated', item.value);
         ElMessage.success('更新成功');
+        router.back();
       } else {
-        ElMessage.error('更新失败');
+        let tip = '更新失败';
+        switch (res.code) {
+          default:
+            break;
+          // case 5:
+          //   tip += '，名称重复';
+          //   break;
+        }
+        ElMessage.error(tip);
       }
       break;
   }
-  router.back();
 };
 const cancel = () => {
   router.back();
 };
 const init = async () => {
-  switch (query.mode) {
+  query.value = route.query as Query;
+  const node = treeRef?.value?.getNode(ROOT_ID);
+  if (node) {
+    node.loaded = false;
+    node.loading = true;
+    const items = await OutlayCat.list({ parentId: ROOT_ID });
+    node.childNodes.splice(0);
+    node.doCreateChildren(items);
+    node.loaded = true;
+    node.loading = false;
+  }
+  switch (query.value.mode) {
     case 'create':
+      expandedIds.clear();
+      expandedIds.add(ROOT_ID);
+      item.value = new Outlay({
+        id: undefined,
+        name: '',
+        catId: '',
+        money: 0,
+        original: 0,
+        amount: 0,
+        unit: '',
+        time: new Date().format('YYYY-MM-DD HH:mm:ss'),
+        userId: '',
+        cat: {
+          parentId: '',
+          name: '',
+          unit: '',
+          sort: 0,
+          stable: false,
+          remark: '',
+        },
+      });
       break;
     case 'update':
-      const res = await Outlay.get(query.id);
+      const res = await Outlay.get(query.value.id);
       if (res) {
+        if (res.cat.parentId) {
+          const ids = await OutlayCat.getParentIds(res.cat.parentId);
+          expandedIds.clear();
+          for (const id of ids) {
+            expandedIds.add(id);
+          }
+        }
         item.value = res;
       }
       break;
@@ -157,5 +214,6 @@ type Emits = {
   updated: [item: Outlay];
 };
 const emit = defineEmits<Emits>();
-init();
+onActivated(init);
+// init();
 </script>

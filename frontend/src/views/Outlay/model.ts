@@ -1,6 +1,6 @@
 import * as PagedList from '@/utils/PagedList';
 import { Result } from '@/utils/Result';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { IModel as OutlayCatModel } from '@/views/OutlayCat/model';
 /** 支出基础 */
 export interface IBase {
@@ -88,13 +88,13 @@ export class Outlay implements IDto {
     return (res.data.result || []).map((i) => new Outlay(i));
   };
   static readonly pagedlist = async (dto: IPagedListDto) => {
-    const url = `/api/outlays`;
+    const url = `/api/outlays/paged-list`;
     const res = await axios.get<Result<PagedList.IDto<IDto>>>(url, { params: dto });
     const items = (res.data.result?.items || []).map((i) => new Outlay(i));
     return {
       total: res.data.result?.total || 0,
       items,
-    } as PagedList.IDto<IDto>;
+    } as PagedList.IDto<Outlay>;
   };
   static readonly get = async (id: string) => {
     const url = `/api/outlays/${id}`;
@@ -108,8 +108,10 @@ export class Outlay implements IDto {
   };
   static readonly update = async (dto: IUpdateDto) => {
     const url = `/api/outlays/${dto.id}`;
-    const res = await axios.put<Result<boolean>>(url, dto);
-    return res.data.result;
+    const res = await axios
+      .put<Result<boolean>>(url, dto)
+      .catch((res: AxiosResponse<Result<boolean>>) => res);
+    return res.data;
   };
   static readonly delete = async (id: string) => {
     const url = `/api/outlays/${id}`;
@@ -123,7 +125,12 @@ export class Outlay implements IDto {
   };
   readonly update = () => {
     if (this.id) return Outlay.update(this as IUpdateDto);
-    return false;
+    return {
+      code: -1,
+      error: null,
+      tip: '更新失败',
+      result: false,
+    } as Result<boolean>;
   };
   readonly delete = () => {
     if (this.id) return Outlay.delete(this.id);
