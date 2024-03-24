@@ -43,7 +43,7 @@ export type Result<T> =
       /**
        * 结果
        */
-      result: null;
+      result: null | T;
       /**
        * 提示
        */

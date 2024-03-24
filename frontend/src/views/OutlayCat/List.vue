@@ -2,10 +2,12 @@
   <ElTree
     :load="load"
     :props="treeProps"
-    :default-expanded-keys="[ROOT_ID]"
+    :default-expanded-keys="[...expandedIds]"
     node-key="id"
     lazy
     ref="treeRef"
+    @node-expand="expand"
+    @node-collapse="collapse"
   >
     <template #default="{ node, data: item }: { node: Node, data: OutlayCat }">
       <label>{{ item.name }}</label>
@@ -18,7 +20,7 @@
   </ElTree>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onActivated, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { ElTree, ElButton, ElMessage, ElMessageBox, TreeInstance } from 'element-plus';
 import { Plus, Edit, Delete } from '@element-plus/icons-vue';
@@ -37,10 +39,14 @@ const treeProps: TreeOptionProps = {
   isLeaf: (data, _node) => !(data as OutlayCat).hasChildren,
 };
 const treeRef = ref<TreeInstance>();
+const expandedIds = reactive(new Set([ROOT_ID]));
 const load: LoadFunction = async (node: Node, resolve: (data: TreeData) => void) => {
   switch (node.level) {
     case 0:
       resolve([ROOT]);
+      break;
+    case 1:
+      resolve([]);
       break;
     default:
       const parentId = (node.data as OutlayCat).id;
@@ -77,6 +83,27 @@ const remove = async (item: OutlayCat) => {
     }
   }
 };
-const init = async () => {};
-init();
+const expand = (item: OutlayCat, _node: Node) => {
+  if (item.id) {
+    expandedIds.add(item.id);
+  }
+};
+const collapse = (item: OutlayCat, _node: Node) => {
+  if (item.id && item.id !== ROOT_ID) {
+    expandedIds.delete(item.id);
+  }
+};
+const init = async () => {
+  const node = treeRef?.value?.getNode(ROOT_ID);
+  if (node) {
+    node.loaded = false;
+    node.loading = true;
+    const items = await OutlayCat.list({ parentId: ROOT_ID });
+    node.childNodes.splice(0);
+    node.doCreateChildren(items);
+    node.loaded = true;
+    node.loading = false;
+  }
+};
+onActivated(init);
 </script>

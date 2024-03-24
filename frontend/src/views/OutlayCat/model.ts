@@ -1,6 +1,6 @@
 import * as PagedList from '@/utils/PagedList';
 import { Result } from '@/utils/Result';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 /** 支出类型基础 */
 export interface IBase {
   /** 父级Id */
@@ -96,8 +96,11 @@ export class OutlayCat implements IDto {
   };
   static readonly update = async (dto: IUpdateDto) => {
     const url = `/api/outlaycats/${dto.id}`;
-    const res = await axios.put<Result<boolean>>(url, dto);
-    return res.data.result;
+    const res = await axios
+      .put<Result<boolean>>(url, dto)
+      .then((res) => res.data)
+      .catch((err: AxiosError<Result<boolean>>) => err.response?.data);
+    return res;
   };
   static readonly delete = async (id: string) => {
     const url = `/api/outlaycats/${id}`;
@@ -117,7 +120,12 @@ export class OutlayCat implements IDto {
   };
   readonly update = () => {
     if (this.id) return OutlayCat.update(this as IUpdateDto);
-    return false;
+    return {
+      code: -1,
+      error: null,
+      tip: '更新失败',
+      result: false,
+    } as Result<boolean>;
   };
   readonly delete = () => {
     if (this.id) return OutlayCat.delete(this.id);
