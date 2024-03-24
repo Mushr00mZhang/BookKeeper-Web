@@ -25,10 +25,10 @@ func FilterList(tx *gorm.DB, dto outlay.ListDto) *gorm.DB {
 		tx.Where("money <= ?", dto.TopMoney)
 	}
 	if dto.STime != nil {
-		tx.Where("date >= ?", dto.STime)
+		tx.Where("time >= ?", dto.STime)
 	}
 	if dto.ETime != nil {
-		tx.Where("date < ?", dto.ETime)
+		tx.Where("time < ?", dto.ETime)
 	}
 	if dto.UserId != nil {
 		tx = tx.Where("user_id = ?", dto.UserId)
