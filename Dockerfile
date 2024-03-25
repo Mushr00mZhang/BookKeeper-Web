@@ -7,6 +7,7 @@ WORKDIR /backend
 COPY ./backend /backend
 RUN apk add --no-cache gcc musl-dev
 RUN go build -ldflags -w -o svc .
+RUN ls -la
 
 FROM node:20-alpine AS fe-builder
 WORKDIR /frontend
@@ -15,6 +16,7 @@ RUN npm config set registry https://registry.npmmirror.com
 RUN yarn install --slient
 RUN yarn global add vite
 RUN vite build
+RUN ls -la
 
 FROM scratch
 WORKDIR /app
