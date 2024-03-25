@@ -17,8 +17,7 @@ RUN yarn global add vite
 RUN vite build
 
 FROM scratch
-# WORKDIR /app
-COPY --from=be-builder /backend/svc2 /app/svc
+COPY --from=be-builder /backend/svc /app/svc
 COPY --from=fe-builder /frontend/dist /app/dist
 EXPOSE 8080
 CMD ["/app/svc"]
