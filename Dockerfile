@@ -5,7 +5,7 @@ ENV GOOS linux
 # ENV GOPROXY https://goproxy.cn,direct
 WORKDIR /backend
 COPY ./backend .
-RUN apk add --no-cache gcc musl-dev
+# RUN apk add --no-cache gcc musl-dev
 RUN go build -ldflags -w -o app .
 
 FROM node:20-alpine AS fe-builder
