@@ -6,7 +6,7 @@ ENV GOOS linux
 WORKDIR /backend
 COPY ./backend .
 # RUN apk add --no-cache gcc musl-dev
-RUN go build -ldflags -w -o app .
+RUN go build -ldflags="-w -s" -o svc .
 
 FROM node:20-alpine AS fe-builder
 WORKDIR /frontend
@@ -17,8 +17,8 @@ RUN yarn global add vite
 RUN vite build
 
 FROM scratch
-WORKDIR /
-COPY --from=be-builder /backend/app .
+WORKDIR /app
+COPY --from=be-builder /backend/svc .
 COPY --from=fe-builder /frontend/dist/ .
 EXPOSE 8080
-CMD ["/app"]
+CMD ["/app/svc"]
