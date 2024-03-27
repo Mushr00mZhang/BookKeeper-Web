@@ -19,6 +19,6 @@ RUN vite build
 FROM scratch
 WORKDIR /app
 COPY --from=be-builder /backend/svc .
-COPY --from=fe-builder /frontend/dist/ .
+COPY --from=fe-builder /frontend/dist/ ./dist/
 EXPOSE 8080
 CMD ["/app/svc"]
