@@ -29,7 +29,9 @@ func main() {
 	}
 
 	r := mux.NewRouter()
-	controllers.Init(r.PathPrefix("").Subrouter())
+	sub := r.PathPrefix("").Subrouter()
+	sub.Handle("/", http.FileServer(http.Dir("./dist/")))
+	controllers.Init(sub)
 	http.Handle("/", r)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
