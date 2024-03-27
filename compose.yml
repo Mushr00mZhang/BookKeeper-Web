@@ -4,4 +4,4 @@ services:
     ports:
       - 8080:8080
     volumes:
-      - ./bookkeeper/:/app/
+      - /app/bookkeeper/BookKeeper.db:/app/BookKeeper.db
