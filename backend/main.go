@@ -6,9 +6,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gorilla/mux"
 	// "gorm.io/driver/sqlite"
 	"github.com/glebarez/sqlite"
+	"github.com/gorilla/mux"
 	"gorm.io/gorm"
 )
 
@@ -29,9 +29,8 @@ func main() {
 	}
 
 	r := mux.NewRouter()
-	sub := r.PathPrefix("").Subrouter()
-	sub.Handle("/", http.FileServer(http.Dir("./dist/")))
-	controllers.Init(sub)
+	controllers.Init(r)
+	r.PathPrefix("").Handler(http.FileServer(http.Dir("./dist")))
 	http.Handle("/", r)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
