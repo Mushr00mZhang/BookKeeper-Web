@@ -38,9 +38,9 @@ deploy:
     # - chmod 644 ~/.ssh/known_hosts
   script:
     - DOCKER_HOST="ssh://${SSH_SERVER_USER}@${SSH_SERVER_IP}"
-    - docker compose -p BookKeeper down
-    - docker compose -p BookKeeper pull -q
-    - docker compose -p BookKeeper up -d
+    - docker compose -p bookkeeper down
+    - docker compose -p bookkeeper pull -q
+    - docker compose -p bookkeeper up -d
     ##
     ## Assuming you created the SSH_KNOWN_HOSTS variable, uncomment the
     ## following two lines.
