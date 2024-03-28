@@ -29,14 +29,12 @@ deploy:
   variables:
     DOCKER_IMAGE_NAME: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
   before_script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-    - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
+    - mkdir ~/.ssh
+    - echo -e "Host *\n\tStrictHostKeyChecking no" >> ~/.ssh/config
+    - chmod -R 400 ~/.ssh/
     - eval $(ssh-agent -s)
-    - echo "$SSH_PRIVATE_KEY" > id_ed25519
-    - chmod 400 id_ed25519
-    - ssh-add id_ed25519
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
+    - echo "$SSH_STAGING_SERVER_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
   script:
     - DOCKER_HOST="ssh://${SSH_SERVER_USER}@${SSH_SERVER_IP}"
     - docker compose -p bookkeeper down
