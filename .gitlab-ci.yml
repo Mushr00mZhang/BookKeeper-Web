@@ -37,6 +37,7 @@ deploy:
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     - ssh-keyscan $SSH_SERVER_IP
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" >> ~/.ssh/config'
   script:
     - DOCKER_HOST="ssh://${SSH_SERVER_USER}@${SSH_SERVER_IP}"
     - docker compose -p bookkeeper down
