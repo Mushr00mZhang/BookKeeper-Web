@@ -160,6 +160,16 @@ const init = async () => {
           expandedIds.add(id);
         }
       }
+      item.value = new OutlayCat({
+        id: undefined,
+        parentId: query.value.parentId,
+        name: '',
+        unit: '',
+        sort: 0,
+        stable: false,
+        remark: '',
+        hasChildren: false,
+      });
       item.value.parentId = query.value.parentId;
       break;
     case 'update':
