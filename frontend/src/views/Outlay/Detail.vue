@@ -39,7 +39,8 @@
     </ElFormItem>
     <ElFormItem label="用户">
       <ElSelect v-model="item.userId">
-        <ElOption label="空" :value="ROOT_ID" />
+        <ElOption label="张天培" :value="ROOT_ID" />
+        <ElOption label="陈慧芳" value="11111111-1111-1111-1111-111111111111" />
       </ElSelect>
     </ElFormItem>
     <ElFormItem>
