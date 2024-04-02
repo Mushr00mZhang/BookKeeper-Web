@@ -12,5 +12,6 @@ import { RouterLink } from 'vue-router';
 .aside-links {
   display: flex;
   flex-direction: column;
+  white-space: nowrap;
 }
 </style>

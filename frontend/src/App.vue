@@ -1,17 +1,15 @@
 <template>
-  <div class="common-layout">
-    <Framework>
-      <template #header>
-        <Header></Header>
-      </template>
-      <template #aside>
-        <Aside></Aside>
-      </template>
-      <template #main>
-        <Main></Main>
-      </template>
-    </Framework>
-  </div>
+  <Framework>
+    <template #header>
+      <Header></Header>
+    </template>
+    <template #aside>
+      <Aside></Aside>
+    </template>
+    <template #main>
+      <Main></Main>
+    </template>
+  </Framework>
 </template>
 <script setup lang="ts">
 import Framework from '@/components/Framework.vue';
