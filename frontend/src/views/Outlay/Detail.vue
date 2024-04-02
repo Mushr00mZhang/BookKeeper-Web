@@ -111,7 +111,7 @@ const item = ref<Outlay>(
     original: 0,
     amount: 0,
     unit: '',
-    time: new Date().format('YYYY-MM-DD HH:mm:ss'),
+    time: new Date().format('YYYY-MM-DDTHH:mm:ss+08:00'),
     userId: '',
     cat: {
       parentId: '',
@@ -182,7 +182,7 @@ const init = async () => {
         original: 0,
         amount: 0,
         unit: '',
-        time: new Date().format('YYYY-MM-DD HH:mm:ss'),
+        time: new Date().format('YYYY-MM-DDTHH:mm:ss+08:00'),
         userId: '',
         cat: {
           parentId: '',
