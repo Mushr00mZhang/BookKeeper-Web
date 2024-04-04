@@ -4,8 +4,10 @@ import OutlayDetail from '@/views/Outlay/Detail.vue';
 import OutlayCatList from '@/views/OutlayCat/List.vue';
 import OutlayCatDetail from '@/views/OutlayCat/Detail.vue';
 import Index from '@/views/Index/Index.vue';
+import Dashboard from '@/views/Dashboard/index.vue';
 const routes: RouteRecordRaw[] = [
   { path: '/', component: Index },
+  { name: 'Dashboard', path: '/dashboard', component: Dashboard },
   {
     name: 'Outlay',
     path: '/outlay',

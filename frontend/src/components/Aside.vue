@@ -1,6 +1,7 @@
 <template>
   <section class="aside-links">
     <RouterLink to="/">首页</RouterLink>
+    <RouterLink to="/dashboard">仪表盘</RouterLink>
     <RouterLink to="/outlay/list">支出列表</RouterLink>
     <RouterLink to="/outlaycat/list">支出类型列表</RouterLink>
   </section>
