@@ -41,6 +41,7 @@
     <ElButton type="success" @click="create" :icon="Plus" circle />
     <div v-for="item in pagedList.items">
       <label>{{ item.name }}</label>
+      <label>￥{{ item.money }}</label>
       <ElButton type="primary" @click="update(item)" :icon="Edit" circle />
       <ElButton type="danger" @click="remove(item)" :icon="Delete" circle />
     </div>
