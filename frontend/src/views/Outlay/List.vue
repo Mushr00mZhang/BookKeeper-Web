@@ -40,10 +40,17 @@
     </ElForm>
     <ElButton type="success" @click="create" :icon="Plus" circle />
     <div v-for="item in pagedList.items">
-      <label>{{ item.name }}</label>
-      <label>￥{{ item.money }}</label>
-      <ElButton type="primary" @click="update(item)" :icon="Edit" circle />
-      <ElButton type="danger" @click="remove(item)" :icon="Delete" circle />
+      <ElRow align="middle">
+        <ElCol :span="6">{{ item.name }}</ElCol>
+        <ElCol :span="6">￥{{ item.money }}</ElCol>
+        <ElCol :span="6">{{ new Date(item.time).format('M/D H:m') }}</ElCol>
+        <ElCol :span="3">
+          <ElButton type="primary" @click="update(item)" :icon="Edit" circle />
+        </ElCol>
+        <ElCol :span="3">
+          <ElButton type="danger" @click="remove(item)" :icon="Delete" circle />
+        </ElCol>
+      </ElRow>
     </div>
     <ElPagination
       :total="pagedList.total"
@@ -67,6 +74,8 @@ import {
   ElMessageBox,
   ElTreeSelect,
   ElDatePicker,
+  ElRow,
+  ElCol,
   TreeInstance,
 } from 'element-plus';
 import { Plus, Edit, Delete } from '@element-plus/icons-vue';
@@ -118,7 +127,7 @@ const filter = reactive<OutlayPagedListDto>({
   catId: undefined,
   lowMoney: undefined,
   topMoney: undefined,
-  sTime: undefined,
+  sTime: new Date().format('YYYY-MM-DDT00:00:00+08:00'),
   eTime: undefined,
   userId: undefined,
   index: 0,
@@ -173,3 +182,11 @@ const init = async () => {
 onActivated(init);
 watchEffect(list);
 </script>
+<style lang="scss" scoped>
+.el-input-number {
+  width: 120px;
+}
+.el-row {
+  line-height: 32px;
+}
+</style>
