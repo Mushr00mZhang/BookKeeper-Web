@@ -36,7 +36,7 @@ const toggleAside = () => {
 .framework {
   width: 100%;
   height: 100%;
-  .el-header {
+  > .el-header {
     height: 0.33rem;
     border-bottom: 0.01rem solid;
     padding: 0;
@@ -48,8 +48,11 @@ const toggleAside = () => {
       width: 0.32rem;
     }
   }
-  .el-aside {
-    transition: width 0.1s;
+  > .el-container {
+    overflow: hidden;
+    > .el-aside {
+      transition: width 0.1s;
+    }
   }
 }
 </style>
