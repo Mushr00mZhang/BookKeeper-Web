@@ -15,7 +15,7 @@
         />
       </ElFormItem>
     </ElForm>
-    <div id="bookkeeper-dashboard-chart-day" class="bookkeeper-dashboard-chart"></div>
+    <div id="bookkeeper-dashboard-chart-daily" class="bookkeeper-dashboard-chart"></div>
   </section>
 </template>
 <script setup lang="ts">
@@ -36,9 +36,16 @@ const getXAxisData = () => {
   }
   return dates;
 };
-let dayChart: echarts.ECharts | null = null;
+let dailyChart: echarts.ECharts | null = null;
+const resizeObserver = new ResizeObserver((_entries) => dailyChart?.resize());
 const initDayChart = () => {
   const option: echarts.EChartsOption = {
+    grid: {
+      left: 64,
+      right: 32,
+      top: 32,
+      bottom: 16,
+    },
     xAxis: {
       type: 'category',
       data: getXAxisData(),
@@ -64,11 +71,12 @@ const initDayChart = () => {
       },
     ],
   };
-  const el = document.getElementById('bookkeeper-dashboard-chart-day');
+  const el = document.getElementById('bookkeeper-dashboard-chart-daily');
   if (el) {
     const chart = echarts.getInstanceByDom(el) || echarts.init(el, { locale: 'zh-CN' });
-    dayChart = chart;
-    dayChart.setOption(option);
+    dailyChart = chart;
+    dailyChart.setOption(option);
+    resizeObserver.observe(el);
   }
 };
 const getDayChartData = async () => {
@@ -86,8 +94,8 @@ const getDayChartData = async () => {
     },
     series: [{ data: [...dates] }],
   };
-  if (dayChart) {
-    dayChart.setOption(option);
+  if (dailyChart) {
+    dailyChart.setOption(option);
   }
 };
 /**
