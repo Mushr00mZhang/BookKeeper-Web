@@ -38,7 +38,7 @@ func FilterList(tx *gorm.DB, dto outlay.ListDto) *gorm.DB {
 func List(db *gorm.DB, dto outlay.ListDto) ([]outlay.Dto, int8, error) {
 	var res []outlay.Dto
 	tx := db.Model(&outlay_model.Outlay{}).Preload("Cat")
-	tx = FilterList(tx, dto).Find(&res)
+	tx = FilterList(tx, dto).Order("time desc").Find(&res)
 	if tx.Error != nil {
 		log.Printf("获取%s列表失败。%s\n", NAME, tx.Error)
 		return make([]outlay.Dto, 0), 1, tx.Error
@@ -65,7 +65,7 @@ func PagedList(db *gorm.DB, dto outlay.PagedListDto) (pagedlist.Dto[outlay.Dto],
 		return res, 0, nil
 	}
 	tx := db.Model(&outlay_model.Outlay{}).Preload("Cat")
-	tx = FilterList(tx, dto.ListDto).Offset(dto.Index * dto.Size).Limit(dto.Size).Find(&res.Items)
+	tx = FilterList(tx, dto.ListDto).Order("time desc").Offset(dto.Index * dto.Size).Limit(dto.Size).Find(&res.Items)
 	if tx.Error != nil {
 		log.Printf("获取%s分页列表失败。%s\n", NAME, tx.Error)
 		return res, 2, tx.Error
