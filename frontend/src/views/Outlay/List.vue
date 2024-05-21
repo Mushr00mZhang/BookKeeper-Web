@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ElForm>
+    <ElForm size="small">
       <ElFormItem label="类型">
         <ElTreeSelect
           v-model="filter.catId"
@@ -39,18 +39,21 @@
       </ElFormItem>
     </ElForm>
     <ElButton type="success" @click="create" :icon="Plus" circle />
-    <div v-for="item in pagedList.items">
-      <ElRow align="middle">
-        <ElCol :span="6">{{ item.name }}</ElCol>
-        <ElCol :span="6">￥{{ item.money }}</ElCol>
-        <ElCol :span="6">{{ new Date(item.time).format('M/D H:m') }}</ElCol>
-        <ElCol :span="3">
-          <ElButton type="primary" @click="update(item)" :icon="Edit" circle />
-        </ElCol>
-        <ElCol :span="3">
-          <ElButton type="danger" @click="remove(item)" :icon="Delete" circle />
-        </ElCol>
-      </ElRow>
+    <div class="item-card" v-for="item in pagedList.items">
+      <div>
+        <div>
+          <span class="item-card-name">{{ item.name }}</span>
+          <span class="item-card-cat">{{ item.cat.name }}</span>
+        </div>
+        <div>
+          <span class="item-card-money">￥{{ item.money }}</span>
+          <span class="item-card-time">{{ new Date(item.time).format('MM-DD HH:mm') }}</span>
+        </div>
+      </div>
+      <div class="item-card-ops">
+        <ElButton class="item-card-op" type="primary" @click="update(item)" :icon="Edit" circle />
+        <ElButton class="item-card-op" type="danger" @click="remove(item)" :icon="Delete" circle />
+      </div>
     </div>
     <ElPagination
       :total="pagedList.total"
@@ -188,5 +191,29 @@ watchEffect(list);
 }
 .el-row {
   line-height: 32px;
+}
+.item-card {
+  display: flex;
+  justify-content: space-between;
+  border-radius: 0.08rem;
+  background-color: chocolate;
+  padding: 0.08rem;
+  color: #fff;
+  font-size: 0.16rem;
+  &-name {
+    flex: auto;
+    font-size: 0.2rem;
+  }
+  &-cat,
+  &-time {
+    margin-left: 0.08rem;
+  }
+  &-ops {
+    flex: none;
+    place-self: end;
+  }
+  & + & {
+    margin-top: 0.08rem;
+  }
 }
 </style>
