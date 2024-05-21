@@ -1,8 +1,6 @@
 <template>
   <ElForm v-model="item">
-    <ElFormItem label="名称">
-      <ElInput v-model="item.name" />
-    </ElFormItem>
+    <md-outlined-text-field class="item-field" label="名称" v-model="item.name" required />
     <ElFormItem label="类型">
       <ElTreeSelect
         v-model="item.catId"
@@ -17,18 +15,22 @@
         ref="treeRef"
       />
     </ElFormItem>
-    <ElFormItem label="金额">
-      <ElInputNumber v-model="item.money" />
-    </ElFormItem>
-    <ElFormItem label="原价">
-      <ElInputNumber v-model="item.original" />
-    </ElFormItem>
-    <ElFormItem label="数量">
-      <ElInputNumber v-model="item.amount" />
-    </ElFormItem>
-    <ElFormItem label="单位">
-      <ElInput v-model="item.unit" />
-    </ElFormItem>
+    <md-outlined-text-field
+      class="item-field"
+      label="金额"
+      type="number"
+      prefix-text="￥"
+      v-model="item.money"
+    />
+    <md-outlined-text-field
+      class="item-field"
+      label="原价"
+      type="number"
+      prefix-text="￥"
+      v-model="item.original"
+    />
+    <md-outlined-text-field class="item-field" label="数量" type="number" v-model="item.amount" />
+    <md-outlined-text-field class="item-field" label="单位" v-model="item.unit" />
     <ElFormItem label="时间">
       <ElDatePicker
         v-model="item.time"
@@ -37,12 +39,14 @@
         value-format="YYYY-MM-DDTHH:mm:ss+08:00"
       />
     </ElFormItem>
-    <ElFormItem label="用户">
-      <ElSelect v-model="item.userId">
-        <ElOption label="张天培" :value="ROOT_ID" />
-        <ElOption label="陈慧芳" value="11111111-1111-1111-1111-111111111111" />
-      </ElSelect>
-    </ElFormItem>
+    <md-outlined-select class="item-field" label="用户" v-model="item.userId" required>
+      <md-select-option :value="ROOT_ID">
+        <div slot="headline">张天培</div>
+      </md-select-option>
+      <md-select-option value="11111111-1111-1111-1111-111111111111">
+        <div slot="headline">陈慧芳</div>
+      </md-select-option>
+    </md-outlined-select>
     <ElFormItem>
       <ElButton type="primary" @click="submit">提交</ElButton>
       <ElButton @click="cancel">取消</ElButton>
@@ -57,8 +61,6 @@ import {
   ElForm,
   ElFormItem,
   ElTreeSelect,
-  ElInput,
-  ElInputNumber,
   ElDatePicker,
   ElButton,
   ElMessage,
@@ -80,6 +82,9 @@ import 'element-plus/es/components/input-number/style/css';
 import 'element-plus/es/components/button/style/css';
 import { Outlay } from './model';
 import { OutlayCat, ROOT, ROOT_ID } from '@/views/OutlayCat/model';
+import '@material/web/textfield/outlined-text-field';
+import '@material/web/select/outlined-select';
+import '@material/web/select/select-option';
 const route = useRoute();
 const router = useRouter();
 type Query = { mode: 'create' } | { id: string; mode: 'update' };
@@ -218,3 +223,11 @@ const emit = defineEmits<Emits>();
 onActivated(init);
 // init();
 </script>
+<style scoped lang="scss">
+.item-field {
+  font-family: 'Courier New', Courier, monospace;
+  & + & {
+    margin-top: 20px;
+  }
+}
+</style>
