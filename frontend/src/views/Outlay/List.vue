@@ -77,8 +77,6 @@ import {
   ElMessageBox,
   ElTreeSelect,
   ElDatePicker,
-  ElRow,
-  ElCol,
   TreeInstance,
 } from 'element-plus';
 import { Plus, Edit, Delete } from '@element-plus/icons-vue';
@@ -195,25 +193,25 @@ watchEffect(list);
 .item-card {
   display: flex;
   justify-content: space-between;
-  border-radius: 0.08rem;
+  border-radius: 8px;
   background-color: chocolate;
-  padding: 0.08rem;
+  padding: 8px;
   color: #fff;
-  font-size: 0.16rem;
+  font-size: 16px;
   &-name {
     flex: auto;
-    font-size: 0.2rem;
+    font-size: 20px;
   }
   &-cat,
   &-time {
-    margin-left: 0.08rem;
+    margin-left: 8px;
   }
   &-ops {
     flex: none;
     place-self: end;
   }
   & + & {
-    margin-top: 0.08rem;
+    margin-top: 4px;
   }
 }
 </style>

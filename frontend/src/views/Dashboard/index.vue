@@ -148,11 +148,11 @@ createLoop(getDayChartData, 0.5, init);
 <style lang="scss" scoped>
 .bookkeeper-dashboard {
   width: 100%;
-  // padding: 0.2rem;
+  // padding: 20px;
   overflow: hidden auto;
   .bookkeeper-dashboard-chart {
     width: 100%;
-    height: 3rem;
+    height: 320px;
   }
 }
 </style>

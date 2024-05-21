@@ -6,7 +6,7 @@
     </ElHeader>
     <ElContainer>
       <Transition>
-        <ElAside :width="showAside ? '1.2rem' : '0rem'">
+        <ElAside :width="showAside ? '120px' : '0'">
           <slot name="aside"></slot>
         </ElAside>
       </Transition>
@@ -37,15 +37,15 @@ const toggleAside = () => {
   width: 100%;
   height: 100%;
   > .el-header {
-    height: 0.33rem;
-    border-bottom: 0.01rem solid;
+    height: 33px;
+    border-bottom: 1px solid;
     padding: 0;
     display: flex;
     .menu-switch {
       border: 0;
       padding: 0;
-      height: 0.32rem;
-      width: 0.32rem;
+      height: 32px;
+      width: 32px;
     }
   }
   > .el-container {
