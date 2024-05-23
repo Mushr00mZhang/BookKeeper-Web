@@ -1,7 +1,5 @@
 services:
-  bookkeeper:
-    image: registry.gitlab.com/mushr00m/bookkeeper
+  FinancialRecord-Frontend:
+    image: registry.gitlab.com/financialrecord/frontend
     ports:
-      - 8080:8080
-    volumes:
-      - /app/bookkeeper/BookKeeper.db:/app/BookKeeper.db
+      - 4001:80

@@ -4,6 +4,7 @@ import ElementPlus from 'unplugin-element-plus/vite';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: '',
   plugins: [
     ElementPlus({}),
     vue({
@@ -20,8 +21,9 @@ export default defineConfig({
     },
   },
   server: {
+    port: 4001,
     proxy: {
-      '/api': 'http://localhost:8080',
+      '/api': 'http://localhost:4000',
       // '/api': {
       //   target: 'http://localhost:8080',
       //   changeOrigin: true,

@@ -1,5 +1,4 @@
-/compose*.yml
-/.*
-/frontend/node_modules
-/frontend/*lock*
-/frontend/dist
+compose*.yml
+node_modules
+*lock*
+dist
