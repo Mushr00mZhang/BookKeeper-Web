@@ -187,7 +187,7 @@ const init = async () => {
         amount: 0,
         unit: '',
         time: new Date().format('YYYY-MM-DDTHH:mm:ss+08:00'),
-        userId: '',
+        userId: ROOT_ID,
         cat: {
           parentId: '',
           name: '',
