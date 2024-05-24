@@ -23,6 +23,15 @@ build:
     - if: $CI_COMMIT_BRANCH
       exists:
         - Dockerfile
+      changes:
+        - public/**/**/**/*
+        - src/**/**/**/*
+        - default.conf
+        - Dockerfile
+        - index.html
+        - package.json
+        - tsconfig.*
+        - vite.config.ts
 deploy:
   image: docker:cli
   stage: deploy
