@@ -71,12 +71,12 @@ export class OutlayCat implements IDto {
     // this.children = dto?.children?.map((i) => new OutlayCat(i)) || [];
   }
   static readonly list = async (dto: IListDto) => {
-    const url = `/api/outlaycats`;
+    const url = `api/outlaycats`;
     const res = await axios.get<Result<IDto[]>>(url, { params: dto });
     return (res.data.result || []).map((i) => new OutlayCat(i));
   };
   static readonly pagedlist = async (dto: IPagedListDto) => {
-    const url = `/api/outlaycats`;
+    const url = `api/outlaycats`;
     const res = await axios.get<Result<PagedList.IDto<IDto>>>(url, { params: dto });
     const items = (res.data.result?.items || []).map((i) => new OutlayCat(i));
     return {
@@ -85,17 +85,17 @@ export class OutlayCat implements IDto {
     } as PagedList.IDto<IDto>;
   };
   static readonly get = async (id: string) => {
-    const url = `/api/outlaycats/${id}`;
+    const url = `api/outlaycats/${id}`;
     const res = await axios.get<Result<IDto>>(url);
     return (res.data.result && new OutlayCat(res.data.result)) || null;
   };
   static readonly create = async (dto: ICreateDto) => {
-    const url = `/api/outlaycats`;
+    const url = `api/outlaycats`;
     const res = await axios.post<Result<string>>(url, dto);
     return res.data.result;
   };
   static readonly update = async (dto: IUpdateDto) => {
-    const url = `/api/outlaycats/${dto.id}`;
+    const url = `api/outlaycats/${dto.id}`;
     const res = await axios
       .put<Result<boolean>>(url, dto)
       .then((res) => res.data)
@@ -103,7 +103,7 @@ export class OutlayCat implements IDto {
     return res;
   };
   static readonly delete = async (id: string) => {
-    const url = `/api/outlaycats/${id}`;
+    const url = `api/outlaycats/${id}`;
     const res = await axios.delete<Result<boolean>>(url);
     return res.data.result;
   };

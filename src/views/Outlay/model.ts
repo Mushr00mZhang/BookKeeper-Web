@@ -83,12 +83,12 @@ export class Outlay implements IDto {
     this.cat = dto.cat;
   }
   static readonly list = async (dto: IListDto) => {
-    const url = `/api/outlays`;
+    const url = `api/outlays`;
     const res = await axios.get<Result<IDto[]>>(url, { params: dto });
     return (res.data.result || []).map((i) => new Outlay(i));
   };
   static readonly pagedlist = async (dto: IPagedListDto) => {
-    const url = `/api/outlays/paged-list`;
+    const url = `api/outlays/paged-list`;
     const res = await axios.get<Result<PagedList.IDto<IDto>>>(url, { params: dto });
     const items = (res.data.result?.items || []).map((i) => new Outlay(i));
     return {
@@ -97,24 +97,24 @@ export class Outlay implements IDto {
     } as PagedList.IDto<Outlay>;
   };
   static readonly get = async (id: string) => {
-    const url = `/api/outlays/${id}`;
+    const url = `api/outlays/${id}`;
     const res = await axios.get<Result<IDto>>(url);
     return (res.data.result && new Outlay(res.data.result)) || null;
   };
   static readonly create = async (dto: ICreateDto) => {
-    const url = `/api/outlays`;
+    const url = `api/outlays`;
     const res = await axios.post<Result<string>>(url, dto);
     return res.data.result;
   };
   static readonly update = async (dto: IUpdateDto) => {
-    const url = `/api/outlays/${dto.id}`;
+    const url = `api/outlays/${dto.id}`;
     const res = await axios
       .put<Result<boolean>>(url, dto)
       .catch((res: AxiosResponse<Result<boolean>>) => res);
     return res.data;
   };
   static readonly delete = async (id: string) => {
-    const url = `/api/outlays/${id}`;
+    const url = `api/outlays/${id}`;
     const res = await axios.delete<Result<boolean>>(url);
     return res.data.result;
   };
