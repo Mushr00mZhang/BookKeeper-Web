@@ -31,4 +31,16 @@ export default defineConfig({
       // },
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          echarts: ['echarts'],
+          'element-plus': ['element-plus'],
+          'material-web': ['@material/web'],
+          vue: ['vue']
+        }
+      }
+    }
+  }
 });
