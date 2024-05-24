@@ -3,3 +3,9 @@ services:
     image: registry.gitlab.com/financialrecord/frontend
     ports:
       - 4001:80
+    networks:
+      - default
+networks:
+  default:
+    name: app
+    external: true
