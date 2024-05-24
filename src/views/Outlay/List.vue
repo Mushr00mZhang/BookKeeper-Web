@@ -46,11 +46,10 @@
           <span class="item-card-cat">{{ item.cat.name }}</span>
         </div>
         <div>
-          ￥
           <span class="item-card-original" v-if="item.original > item.money">
-            {{ item.original }}
+            ￥{{ item.original }}
           </span>
-          <span class="item-card-money">{{ item.money }}</span>
+          <span class="item-card-money">￥{{ item.money }}</span>
           <span class="item-card-time">{{ new Date(item.time).format('MM-DD HH:mm') }}</span>
         </div>
       </div>
