@@ -7,13 +7,9 @@ const chunkPackages = [
   'axios',
   'echarts',
   'element-plus',
-  '@element-plus',
   '@material/web',
-  'lodash-es',
   'vue',
-  '@vue',
   'vue-router',
-  'zrender',
 ];
 // https://vitejs.dev/config/
 export default defineConfig({
